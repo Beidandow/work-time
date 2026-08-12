@@ -1,208 +1,453 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#0b0d12" />
-  <title>今日下班時間</title>
-  <style>
-    * { box-sizing: border-box; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#08090c">
+<title>今天幾點下班？</title>
 
-    body {
-      margin: 0;
-      min-height: 100svh;
-      display: grid;
-      place-items: center;
-      padding: 24px;
-      background:
-        radial-gradient(circle at 50% 20%, #202736 0%, #11151d 36%, #090b10 100%);
-      color: #f7f8fb;
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display",
-                   "PingFang TC", "Noto Sans TC", sans-serif;
-    }
+<style>
+* { box-sizing:border-box; }
+html,body { margin:0; min-height:100%; }
+body {
+  min-height:100svh;
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","PingFang TC","Noto Sans TC",sans-serif;
+}
+.page {
+  min-height:100svh;
+  display:grid;
+  place-items:center;
+  padding:24px;
+  overflow:hidden;
+  position:relative;
+}
+.card {
+  width:min(100%,430px);
+  position:relative;
+  z-index:2;
+  text-align:center;
+}
+.label { margin:0; }
+.time {
+  margin:0;
+  font-variant-numeric:tabular-nums;
+}
+.countdown { margin:0; }
+.updated { margin:0; opacity:.45; font-size:12px; }
+.theme-name {
+  position:fixed;
+  right:14px;
+  bottom:12px;
+  z-index:10;
+  font-size:10px;
+  opacity:.25;
+}
+.error { color:#ff8d8d !important; }
 
-    .card {
-      width: min(100%, 420px);
-      padding: 38px 28px 30px;
-      border: 1px solid rgba(255,255,255,.08);
-      border-radius: 30px;
-      background: rgba(255,255,255,.055);
-      box-shadow: 0 24px 70px rgba(0,0,0,.35);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      text-align: center;
-    }
+/* =========================================================
+   THEME 1 — JOHNNY DEPP / CINEMA
+   ========================================================= */
+body.depp {
+  background:#08090c;
+  color:#fff;
+}
+.depp .page {
+  padding:0;
+  display:block;
+  background:#08090c;
+}
+.depp .hero {
+  height:56svh;
+  min-height:370px;
+  position:relative;
+  overflow:hidden;
+}
+.depp .hero img {
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:50% 28%;
+  filter:grayscale(25%) contrast(1.06);
+}
+.depp .hero:after {
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(to bottom,rgba(0,0,0,.02) 30%,rgba(8,9,12,.25) 65%,#08090c 100%);
+}
+.depp .card {
+  margin:-92px auto 0;
+  padding:0 26px 36px;
+}
+.depp .label {
+  color:rgba(255,255,255,.58);
+  font-size:13px;
+  font-weight:700;
+  letter-spacing:.18em;
+}
+.depp .time {
+  margin-top:8px;
+  font-size:clamp(80px,24vw,112px);
+  line-height:.95;
+  font-weight:800;
+  letter-spacing:-.07em;
+  text-shadow:0 8px 32px #000;
+}
+.depp .countdown {
+  margin-top:22px;
+  font-size:20px;
+  font-weight:650;
+}
+.depp .updated { margin-top:8px; }
+.depp .extra {
+  width:min(100%,320px);
+  margin:26px auto 0;
+  padding-top:21px;
+  border-top:1px solid rgba(255,255,255,.11);
+  color:rgba(255,255,255,.68);
+  font-size:14px;
+}
+.depp .credit {
+  margin-top:18px;
+  font-size:9px;
+  opacity:.25;
+}
 
-    .label {
-      margin: 0 0 14px;
-      color: rgba(255,255,255,.62);
-      font-size: 15px;
-      font-weight: 600;
-      letter-spacing: .12em;
-    }
+/* =========================================================
+   THEME 2 — MINIMAL / APPLE-LIKE
+   ========================================================= */
+body.minimal {
+  background:#f5f5f2;
+  color:#111;
+}
+.minimal .page {
+  background:
+    radial-gradient(circle at 50% 20%,#fff 0,#f5f5f2 55%,#e9e9e5 100%);
+}
+.minimal .card {
+  padding:52px 26px;
+}
+.minimal .label {
+  font-size:13px;
+  font-weight:650;
+  letter-spacing:.16em;
+  color:#777;
+}
+.minimal .time {
+  margin-top:18px;
+  font-size:clamp(88px,25vw,122px);
+  line-height:.95;
+  font-weight:700;
+  letter-spacing:-.075em;
+}
+.minimal .countdown {
+  margin-top:30px;
+  font-size:20px;
+  font-weight:600;
+}
+.minimal .updated { margin-top:10px; }
+.minimal .extra {
+  margin:42px auto 0;
+  padding-top:24px;
+  width:180px;
+  border-top:1px solid #ccc;
+  font-size:13px;
+  color:#777;
+}
 
-    .time {
-      margin: 0;
-      font-size: clamp(72px, 23vw, 108px);
-      line-height: .96;
-      font-weight: 750;
-      letter-spacing: -.06em;
-      font-variant-numeric: tabular-nums;
-    }
+/* =========================================================
+   THEME 3 — CYBER HUD
+   ========================================================= */
+body.cyber {
+  background:#020609;
+  color:#9dffd7;
+}
+.cyber .page {
+  background:
+    linear-gradient(rgba(75,255,190,.035) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(75,255,190,.035) 1px,transparent 1px),
+    radial-gradient(circle at 50% 45%,#0b2621 0,#03100e 38%,#020609 72%);
+  background-size:24px 24px,24px 24px,auto;
+}
+.cyber .card {
+  border:1px solid rgba(119,255,210,.35);
+  padding:38px 24px 32px;
+  box-shadow:0 0 35px rgba(90,255,200,.08),inset 0 0 30px rgba(90,255,200,.03);
+}
+.cyber .card:before,
+.cyber .card:after {
+  content:"";
+  position:absolute;
+  width:34px;
+  height:34px;
+  border-color:#71ffd0;
+}
+.cyber .card:before {
+  left:-1px; top:-1px;
+  border-left:3px solid;
+  border-top:3px solid;
+}
+.cyber .card:after {
+  right:-1px; bottom:-1px;
+  border-right:3px solid;
+  border-bottom:3px solid;
+}
+.cyber .label {
+  font-family:Consolas,monospace;
+  font-size:12px;
+  letter-spacing:.2em;
+}
+.cyber .time {
+  margin-top:22px;
+  font-family:Consolas,"Courier New",monospace;
+  font-size:clamp(72px,21vw,100px);
+  line-height:1;
+  font-weight:700;
+  letter-spacing:-.06em;
+  text-shadow:0 0 18px rgba(100,255,205,.32);
+}
+.cyber .countdown {
+  margin-top:28px;
+  font-family:Consolas,monospace;
+  font-size:17px;
+}
+.cyber .updated {
+  margin-top:11px;
+  font-family:Consolas,monospace;
+}
+.cyber .extra {
+  margin-top:30px;
+  font-family:Consolas,monospace;
+  font-size:11px;
+  letter-spacing:.12em;
+  opacity:.5;
+}
 
-    .divider {
-      width: 44px;
-      height: 1px;
-      margin: 28px auto 22px;
-      background: rgba(255,255,255,.16);
-    }
-
-    .countdown {
-      min-height: 30px;
-      margin: 0;
-      font-size: 20px;
-      font-weight: 650;
-      letter-spacing: -.02em;
-    }
-
-    .sub {
-      margin: 9px 0 0;
-      color: rgba(255,255,255,.42);
-      font-size: 13px;
-    }
-
-    .error {
-      color: #ffb4b4;
-    }
-
-    @media (max-width: 380px) {
-      .card { padding-inline: 20px; }
-    }
-  </style>
+/* =========================================================
+   THEME 4 — RETRO DIGITAL CLOCK
+   ========================================================= */
+body.retro {
+  background:#21170f;
+  color:#ffb34c;
+}
+.retro .page {
+  background:
+    radial-gradient(circle at center,#4a2d16 0,#27180e 42%,#120c08 100%);
+}
+.retro .card {
+  padding:38px 24px 32px;
+  border-radius:18px;
+  background:#130f0b;
+  border:8px solid #34271c;
+  box-shadow:0 24px 70px #000;
+}
+.retro .label {
+  color:#b9956a;
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:.18em;
+}
+.retro .time {
+  margin-top:18px;
+  font-family:Consolas,"Courier New",monospace;
+  font-size:clamp(76px,22vw,106px);
+  line-height:1;
+  font-weight:700;
+  letter-spacing:-.07em;
+  color:#ff9f2f;
+  text-shadow:0 0 8px #ff7b00,0 0 25px rgba(255,100,0,.35);
+}
+.retro .countdown {
+  margin-top:27px;
+  font-size:18px;
+  color:#ffd19a;
+}
+.retro .updated { margin-top:9px; color:#b9956a; }
+.retro .extra {
+  margin-top:30px;
+  padding-top:20px;
+  border-top:1px dashed #5b4027;
+  font-family:Consolas,monospace;
+  font-size:12px;
+  color:#8f7456;
+}
+</style>
 </head>
 
 <body>
-  <main class="card">
-    <p class="label">TODAY · 下班時間</p>
+<main class="page">
+  <section class="hero" id="hero" hidden>
+    <img src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Johnny_Depp-2821.jpg"
+         alt="Johnny Depp">
+  </section>
+
+  <section class="card">
+    <p class="label" id="label">TODAY · 下班時間</p>
     <h1 class="time" id="offTime">--:--</h1>
-
-    <div class="divider"></div>
-
     <p class="countdown" id="countdown">讀取中…</p>
-    <p class="sub" id="updated"></p>
-  </main>
+    <p class="updated" id="updated"></p>
+    <p class="extra" id="extra"></p>
+    <p class="credit" id="credit"></p>
+  </section>
+</main>
 
-  <script>
-    // Gist 內只需要放 4 碼下班時間，例如：1722
-    const GIST_RAW =
-      "https://gist.githubusercontent.com/Beidandow/ae9a628b872d72ef0e019324ac6cadae/raw/work_start.txt";
+<div class="theme-name" id="themeName"></div>
 
-    let offHour = null;
-    let offMinute = null;
+<script>
+/* =========================================================
+   設定
+   ========================================================= */
+const GIST_RAW =
+  "https://gist.githubusercontent.com/Beidandow/ae9a628b872d72ef0e019324ac6cadae/raw/work_start.txt";
 
-    function taipeiParts() {
-      const parts = new Intl.DateTimeFormat("en-CA", {
-        timeZone: "Asia/Taipei",
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-        hourCycle: "h23"
-      }).formatToParts(new Date());
+const THEMES = ["depp", "minimal", "cyber", "retro"];
 
-      return Object.fromEntries(
-        parts
-          .filter(p => p.type !== "literal")
-          .map(p => [p.type, Number(p.value)])
-      );
+/* 每次載入網頁隨機抽一個 Theme */
+const selectedTheme = THEMES[Math.floor(Math.random() * THEMES.length)];
+document.body.className = selectedTheme;
+
+/* Theme 個別文字與元素 */
+const hero = document.getElementById("hero");
+const label = document.getElementById("label");
+const extra = document.getElementById("extra");
+const credit = document.getElementById("credit");
+const themeName = document.getElementById("themeName");
+
+if (selectedTheme === "depp") {
+  hero.hidden = false;
+  label.textContent = "TODAY · 下班時間";
+  extra.textContent = "工作會結束。今晚會開始。";
+  credit.textContent = "Photo: Harald Krichel / Wikimedia Commons · CC BY-SA 3.0";
+  themeName.textContent = "CINEMA";
+}
+
+if (selectedTheme === "minimal") {
+  label.textContent = "今天幾點下班？";
+  extra.textContent = "今日";
+  themeName.textContent = "MINIMAL";
+}
+
+if (selectedTheme === "cyber") {
+  label.textContent = "CLOCK_OUT // SYSTEM";
+  extra.textContent = "STATUS : COUNTDOWN ACTIVE";
+  themeName.textContent = "CYBER";
+}
+
+if (selectedTheme === "retro") {
+  label.textContent = "CLOCK OUT";
+  extra.textContent = "WORKDAY TIMER";
+  themeName.textContent = "RETRO";
+}
+
+/* =========================================================
+   台北時間
+   ========================================================= */
+let offHour = null;
+let offMinute = null;
+
+function taipeiParts() {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone:"Asia/Taipei",
+    year:"numeric",
+    month:"2-digit",
+    day:"2-digit",
+    hour:"2-digit",
+    minute:"2-digit",
+    second:"2-digit",
+    hourCycle:"h23"
+  }).formatToParts(new Date());
+
+  return Object.fromEntries(
+    parts.filter(p => p.type !== "literal")
+         .map(p => [p.type, Number(p.value)])
+  );
+}
+
+/* =========================================================
+   倒數
+   ========================================================= */
+function renderCountdown() {
+  if (offHour === null || offMinute === null) return;
+
+  const now = taipeiParts();
+  const nowMinutes = now.hour * 60 + now.minute;
+  const offMinutes = offHour * 60 + offMinute;
+  const diff = offMinutes - nowMinutes;
+  const el = document.getElementById("countdown");
+
+  if (diff > 0) {
+    const h = Math.floor(diff / 60);
+    const m = diff % 60;
+
+    if (selectedTheme === "cyber") {
+      el.textContent = `T-${String(h).padStart(2,"0")}H ${String(m).padStart(2,"0")}M`;
+    } else if (h > 0 && m > 0) {
+      el.textContent = `還有 ${h} 小時 ${m} 分`;
+    } else if (h > 0) {
+      el.textContent = `還有 ${h} 小時`;
+    } else {
+      el.textContent = `還有 ${m} 分`;
     }
+  } else if (diff === 0) {
+    el.textContent = selectedTheme === "cyber" ? "CLOCK_OUT READY" : "下班時間到了";
+  } else {
+    el.textContent = selectedTheme === "cyber" ? "STATUS : OFF DUTY" : "今天下班了";
+  }
+}
 
-    function renderCountdown() {
-      if (offHour === null || offMinute === null) return;
+/* =========================================================
+   從 Gist 讀取下班時間
+   ========================================================= */
+async function loadOffTime() {
+  const offTime = document.getElementById("offTime");
+  const countdown = document.getElementById("countdown");
+  const updated = document.getElementById("updated");
 
-      const now = taipeiParts();
-      const nowMinutes = now.hour * 60 + now.minute;
-      const offMinutes = offHour * 60 + offMinute;
-      const diff = offMinutes - nowMinutes;
+  try {
+    const response = await fetch(`${GIST_RAW}?t=${Date.now()}`, {
+      cache:"no-store"
+    });
 
-      const countdown = document.getElementById("countdown");
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
-      if (diff > 0) {
-        const h = Math.floor(diff / 60);
-        const m = diff % 60;
+    const text = (await response.text()).trim();
+    const match = text.match(/^(\d{2})(\d{2})$/);
 
-        if (h > 0 && m > 0) {
-          countdown.textContent = `還有 ${h} 小時 ${m} 分`;
-        } else if (h > 0) {
-          countdown.textContent = `還有 ${h} 小時`;
-        } else {
-          countdown.textContent = `還有 ${m} 分`;
-        }
-      } else if (diff === 0) {
-        countdown.textContent = "下班時間到了";
-      } else {
-        countdown.textContent = "今天下班了";
-      }
-    }
+    if (!match) throw new Error("Gist 必須是 4 碼 HHMM");
 
-    async function loadOffTime() {
-      const offTime = document.getElementById("offTime");
-      const countdown = document.getElementById("countdown");
-      const updated = document.getElementById("updated");
+    const hh = Number(match[1]);
+    const mm = Number(match[2]);
 
-      try {
-        // 避免瀏覽器/CDN 快取舊值
-        const response = await fetch(`${GIST_RAW}?t=${Date.now()}`, {
-          cache: "no-store"
-        });
+    if (hh > 23 || mm > 59) throw new Error("時間格式錯誤");
 
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
-        }
+    offHour = hh;
+    offMinute = mm;
 
-        const text = (await response.text()).trim();
-        const match = text.match(/^(\d{2})(\d{2})$/);
+    offTime.textContent =
+      `${String(hh).padStart(2,"0")}:${String(mm).padStart(2,"0")}`;
 
-        if (!match) {
-          throw new Error("Gist 格式必須是 4 碼 HHMM");
-        }
+    renderCountdown();
 
-        const hh = Number(match[1]);
-        const mm = Number(match[2]);
+    const now = taipeiParts();
+    updated.textContent =
+      `更新於 ${String(now.hour).padStart(2,"0")}:${String(now.minute).padStart(2,"0")}`;
 
-        if (hh > 23 || mm > 59) {
-          throw new Error("時間格式無效");
-        }
+    countdown.classList.remove("error");
 
-        offHour = hh;
-        offMinute = mm;
+  } catch (err) {
+    offTime.textContent = "--:--";
+    countdown.textContent = "暫時無法讀取下班時間";
+    countdown.classList.add("error");
+    updated.textContent = "";
+    console.error(err);
+  }
+}
 
-        offTime.textContent =
-          `${String(hh).padStart(2, "0")}:${String(mm).padStart(2, "0")}`;
+loadOffTime();
 
-        renderCountdown();
-
-        const now = taipeiParts();
-        updated.textContent =
-          `更新於 ${String(now.hour).padStart(2, "0")}:${String(now.minute).padStart(2, "0")}`;
-        countdown.classList.remove("error");
-
-      } catch (err) {
-        offTime.textContent = "--:--";
-        countdown.textContent = "暫時無法讀取下班時間";
-        countdown.classList.add("error");
-        updated.textContent = "";
-        console.error(err);
-      }
-    }
-
-    loadOffTime();
-
-    // 倒數每分鐘更新；Gist 每 30 秒重新抓一次
-    setInterval(renderCountdown, 60 * 1000);
-    setInterval(loadOffTime, 30 * 1000);
-  </script>
+/* 倒數每分鐘更新；Gist 每 30 秒重新抓取 */
+setInterval(renderCountdown, 60 * 1000);
+setInterval(loadOffTime, 30 * 1000);
+</script>
 </body>
 </html>
