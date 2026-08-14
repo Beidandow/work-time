@@ -271,13 +271,85 @@ body.retro {
   font-size:12px;
   color:#8f7456;
 }
+
+/* =========================================================
+   THEME 5 — BLUE LAN / MIDNIGHT BLUE
+   ========================================================= */
+body.bluelan {
+  background:#06111f;
+  color:#f4f8ff;
+}
+.bluelan .page {
+  padding:0;
+  display:block;
+  background:#06111f;
+}
+.bluelan .hero {
+  height:58svh;
+  min-height:390px;
+  position:relative;
+  overflow:hidden;
+}
+.bluelan .hero img {
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:50% 24%;
+  filter:saturate(.78) contrast(1.06);
+}
+.bluelan .hero:after {
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    linear-gradient(to bottom,rgba(3,15,29,.02) 25%,rgba(3,15,29,.2) 60%,#06111f 100%),
+    linear-gradient(110deg,rgba(17,93,165,.16),transparent 55%);
+}
+.bluelan .card {
+  margin:-96px auto 0;
+  padding:0 26px 36px;
+}
+.bluelan .label {
+  color:rgba(202,225,255,.72);
+  font-size:13px;
+  font-weight:750;
+  letter-spacing:.16em;
+}
+.bluelan .time {
+  margin-top:8px;
+  font-size:clamp(80px,24vw,112px);
+  line-height:.95;
+  font-weight:800;
+  letter-spacing:-.07em;
+  text-shadow:0 8px 34px #000,0 0 24px rgba(61,152,255,.2);
+}
+.bluelan .countdown {
+  margin-top:22px;
+  font-size:20px;
+  font-weight:650;
+}
+.bluelan .updated { margin-top:8px; }
+.bluelan .extra {
+  width:min(100%,320px);
+  margin:26px auto 0;
+  padding-top:21px;
+  border-top:1px solid rgba(155,200,255,.16);
+  color:rgba(205,225,250,.72);
+  font-size:14px;
+}
+.bluelan .credit {
+  margin-top:18px;
+  font-size:9px;
+  opacity:.3;
+}
 </style>
 </head>
 
 <body>
 <main class="page">
   <section class="hero" id="hero" hidden>
-    <img src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Johnny_Depp-2821.jpg"
+    <img id="heroImage"
+         src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Johnny_Depp-2821.jpg"
          alt="Johnny Depp">
   </section>
 
@@ -300,7 +372,7 @@ body.retro {
 const GIST_RAW =
   "https://gist.githubusercontent.com/Beidandow/ae9a628b872d72ef0e019324ac6cadae/raw/work_start.txt";
 
-const THEMES = ["depp", "minimal", "cyber", "retro"];
+const THEMES = ["depp", "minimal", "cyber", "retro", "bluelan"];
 
 /* 每次載入網頁隨機抽一個 Theme */
 const selectedTheme = THEMES[Math.floor(Math.random() * THEMES.length)];
@@ -308,35 +380,50 @@ document.body.className = selectedTheme;
 
 /* Theme 個別文字與元素 */
 const hero = document.getElementById("hero");
+const heroImage = document.getElementById("heroImage");
 const label = document.getElementById("label");
 const extra = document.getElementById("extra");
 const credit = document.getElementById("credit");
 const themeName = document.getElementById("themeName");
 
+const today = taipeiParts();
+const dateText = `${today.month}/${today.day}`;
+document.title = `${dateText} 幾點下班？`;
+
 if (selectedTheme === "depp") {
   hero.hidden = false;
-  label.textContent = "TODAY · 下班時間";
+  label.textContent = `${dateText} · 下班時間`;
   extra.textContent = "工作會結束。今晚會開始。";
   credit.textContent = "Photo: Harald Krichel / Wikimedia Commons · CC BY-SA 3.0";
   themeName.textContent = "CINEMA";
 }
 
 if (selectedTheme === "minimal") {
-  label.textContent = "今天幾點下班？";
-  extra.textContent = "今日";
+  label.textContent = `${dateText} 幾點下班？`;
+  extra.textContent = "準時下班，明天再拚。";
   themeName.textContent = "MINIMAL";
 }
 
 if (selectedTheme === "cyber") {
-  label.textContent = "CLOCK_OUT // SYSTEM";
+  label.textContent = `CLOCK_OUT // ${dateText}`;
   extra.textContent = "STATUS : COUNTDOWN ACTIVE";
   themeName.textContent = "CYBER";
 }
 
 if (selectedTheme === "retro") {
-  label.textContent = "CLOCK OUT";
+  label.textContent = `CLOCK OUT · ${dateText}`;
   extra.textContent = "WORKDAY TIMER";
   themeName.textContent = "RETRO";
+}
+
+if (selectedTheme === "bluelan") {
+  hero.hidden = false;
+  heroImage.src = "https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Lan_Cheng-lung_from_%22After_School%22_at_Red_Carpet_of_the_Tokyo_International_Film_Festival_2023_%2853348295349%29.jpg/960px-Lan_Cheng-lung_from_%22After_School%22_at_Red_Carpet_of_the_Tokyo_International_Film_Festival_2023_%2853348295349%29.jpg";
+  heroImage.alt = "藍正龍";
+  label.textContent = `${dateText} · 下班時間`;
+  extra.textContent = "時間到了，就帥氣收工。";
+  credit.textContent = "Photo: Dick Thomas Johnson / Wikimedia Commons · CC BY 2.0";
+  themeName.textContent = "BLUE LAN";
 }
 
 /* =========================================================
