@@ -342,6 +342,77 @@ body.bluelan {
   font-size:9px;
   opacity:.3;
 }
+
+/* 互動按鈕 */
+.actions { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin-top:24px; }
+.actions button {
+  min-height:44px; padding:11px 16px; border:1px solid currentColor;
+  border-radius:999px; background:transparent; color:inherit;
+  font:inherit; font-size:14px; cursor:pointer; touch-action:manipulation;
+  transition:transform .15s, background .15s;
+}
+.actions button:hover { background:rgba(128,128,128,.15); }
+.actions button:active { transform:scale(.96); }
+.actions button:focus-visible { outline:3px solid currentColor; outline-offset:4px; }
+.actions button:disabled { opacity:.5; cursor:wait; }
+.clock-in, .action-status { font-size:13px; line-height:1.6; }
+.clock-in { margin:16px 0 0; opacity:.7; }
+.action-status { margin:10px 0 0; min-height:1.6em; }
+@media (prefers-reduced-motion:reduce) { .actions button { transition:none; } }
+
+/* THEME 6 — CIRCUIT BOARD */
+body.circuit { background:#061b17; color:#d8ffe8; }
+.circuit .page {
+  isolation:isolate;
+  background:
+    radial-gradient(ellipse at 50% 40%,rgba(38,115,74,.32),transparent 65%),
+    linear-gradient(135deg,#092a21,#03130f);
+}
+.circuit .page::before {
+  content:""; position:absolute; inset:0; z-index:-1; opacity:.55;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='280' viewBox='0 0 280 280'%3E%3Cg fill='none' stroke='%23ae9750' stroke-width='1.5'%3E%3Cpath d='M0 35h65l25 25v50h45l25-25h120M0 160h45l35 35v85M280 185h-55l-35 35v60M135 0v35l40 40h105M0 245h30l30-30M220 0v25l25 25h35M115 280v-50l30-30v-45h55l20-20h60'/%3E%3Ccircle cx='90' cy='110' r='5'/%3E%3Ccircle cx='135' cy='35' r='5'/%3E%3Ccircle cx='145' cy='155' r='5'/%3E%3Ccircle cx='60' cy='215' r='5'/%3E%3C/g%3E%3Cg fill='%234b8260'%3E%3Crect x='28' y='68' width='17' height='32' rx='3'/%3E%3Crect x='208' y='82' width='32' height='17' rx='3'/%3E%3Crect x='104' y='158' width='13' height='25' rx='2'/%3E%3C/g%3E%3C/svg%3E");
+  background-size:280px 280px;
+}
+.circuit .card {
+  padding:44px 24px 28px; border:2px solid #b09a59; border-radius:20px;
+  background:linear-gradient(145deg,rgba(16,48,34,.97),rgba(5,24,18,.98));
+  box-shadow:0 22px 70px #0009,inset 0 0 0 7px #102e21,inset 0 0 0 8px #476343;
+}
+.circuit .card::before {
+  content:""; position:absolute; inset:14px; pointer-events:none;
+  background:
+    radial-gradient(circle at 0 0,#cfb975 0 3px,transparent 4px),
+    radial-gradient(circle at 100% 0,#cfb975 0 3px,transparent 4px),
+    radial-gradient(circle at 0 100%,#cfb975 0 3px,transparent 4px),
+    radial-gradient(circle at 100% 100%,#cfb975 0 3px,transparent 4px);
+}
+.circuit .label {
+  color:#c9bb8d; font:600 12px/1.7 Consolas,monospace; letter-spacing:.13em;
+}
+.circuit .label::before {
+  content:""; display:inline-block; width:7px; height:7px; margin-right:9px;
+  border-radius:50%; background:#94ffb1; box-shadow:0 0 10px #73ff9e;
+}
+.circuit .time {
+  margin-top:22px; padding:20px 8px; border:1px solid #3e6042; border-radius:8px;
+  background:repeating-linear-gradient(0deg,#ffffff03 0 1px,transparent 1px 4px),#020e09;
+  box-shadow:inset 0 3px 15px #000; color:#b1ffc3;
+  font:700 clamp(54px,17vw,86px)/1 Consolas,"Courier New",monospace;
+  letter-spacing:-.055em; text-shadow:0 0 18px #64ff9833;
+}
+.circuit .countdown { margin-top:24px; font-size:19px; font-weight:600; }
+.circuit .updated { margin-top:10px; color:#a8c5ad; }
+.circuit .actions { gap:8px; }
+.circuit .actions button {
+  padding:10px 12px; border-radius:6px; border-color:#6c7950;
+  color:#e0d4aa; background:#132c20; box-shadow:0 3px 0 #020c08;
+}
+.circuit .actions button:hover { background:#254432; }
+.circuit .actions button:active { transform:translateY(2px); box-shadow:0 1px 0 #020c08; }
+.circuit .extra {
+  margin:22px 0 0; padding-top:18px; border-top:1px dashed #63734b;
+  color:#9eae88; font:11px/1.7 Consolas,monospace; letter-spacing:.12em;
+}
 </style>
 </head>
 
@@ -358,6 +429,13 @@ body.bluelan {
     <h1 class="time" id="offTime">--:--</h1>
     <p class="countdown" id="countdown">讀取中…</p>
     <p class="updated" id="updated"></p>
+    <p class="clock-in" id="clockIn"></p>
+    <div class="actions" role="group" aria-label="網頁操作">
+      <button type="button" id="refreshButton">↻ 立即更新</button>
+      <button type="button" id="themeButton">◐ 切換風格</button>
+      <button type="button" id="shareButton">↗ 分享連結</button>
+    </div>
+    <p class="action-status" id="actionStatus" role="status" aria-live="polite"></p>
     <p class="extra" id="extra"></p>
     <p class="credit" id="credit"></p>
   </section>
@@ -370,12 +448,12 @@ body.bluelan {
    設定
    ========================================================= */
 const GIST_RAW =
-  "https://gist.githubusercontent.com/Beidandow/ae9a628b872d72ef0e019324ac6cadae/raw/work_start.txt";
+  "https://gist.githubusercontent.com/Beidandow/ae9a628b872d72ef0e019324ac6cadae/raw/clockin.json";
 
-const THEMES = ["depp", "minimal", "cyber", "retro", "bluelan"];
+const THEMES = ["depp", "minimal", "cyber", "retro", "bluelan", "circuit"];
 
 /* 每次載入網頁隨機抽一個 Theme */
-const selectedTheme = THEMES[Math.floor(Math.random() * THEMES.length)];
+let selectedTheme = THEMES[Math.floor(Math.random() * THEMES.length)];
 document.body.className = selectedTheme;
 
 /* Theme 個別文字與元素 */
@@ -386,6 +464,12 @@ const extra = document.getElementById("extra");
 const credit = document.getElementById("credit");
 const themeName = document.getElementById("themeName");
 
+function applyTheme() {
+  document.body.className = selectedTheme;
+  hero.hidden = true;
+  heroImage.src = "https://commons.wikimedia.org/wiki/Special:Redirect/file/Johnny_Depp-2821.jpg";
+  heroImage.alt = "Johnny Depp";
+  credit.textContent = "";
 const today = taipeiParts();
 const dateText = `${today.month}/${today.day}`;
 document.title = `${dateText} 幾點下班？`;
@@ -416,6 +500,12 @@ if (selectedTheme === "retro") {
   themeName.textContent = "RETRO";
 }
 
+if (selectedTheme === "circuit") {
+  label.textContent = `${dateText} · 下班時間`;
+  extra.textContent = "WORK TIME / CIRCUIT EDITION";
+  themeName.textContent = "CIRCUIT";
+}
+
 if (selectedTheme === "bluelan") {
   hero.hidden = false;
   heroImage.src = "https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Lan_Cheng-lung_from_%22After_School%22_at_Red_Carpet_of_the_Tokyo_International_Film_Festival_2023_%2853348295349%29.jpg/960px-Lan_Cheng-lung_from_%22After_School%22_at_Red_Carpet_of_the_Tokyo_International_Film_Festival_2023_%2853348295349%29.jpg";
@@ -426,11 +516,17 @@ if (selectedTheme === "bluelan") {
   themeName.textContent = "BLUE LAN";
 }
 
+}
+applyTheme();
+
 /* =========================================================
    台北時間
    ========================================================= */
 let offHour = null;
 let offMinute = null;
+let offTimestamp = null;
+let recordDate = null;
+let isLoading = false;
 
 function taipeiParts() {
   const parts = new Intl.DateTimeFormat("en-CA", {
@@ -456,10 +552,18 @@ function taipeiParts() {
 function renderCountdown() {
   if (offHour === null || offMinute === null) return;
 
+  if (offTimestamp === null) return;
   const now = taipeiParts();
-  const nowMinutes = now.hour * 60 + now.minute;
-  const offMinutes = offHour * 60 + offMinute;
-  const diff = offMinutes - nowMinutes;
+  const todayString = `${now.year}-${String(now.month).padStart(2,"0")}-${String(now.day).padStart(2,"0")}`;
+  if (recordDate !== todayString && Date.now() >= offTimestamp) {
+    offTimestamp = null;
+    offHour = offMinute = null;
+    document.getElementById("offTime").textContent = "--:--";
+    document.getElementById("countdown").textContent = "今日尚未打卡";
+    document.getElementById("clockIn").textContent = "";
+    return;
+  }
+  const diff = Math.ceil((offTimestamp - Date.now()) / 60000);
   const el = document.getElementById("countdown");
 
   if (diff > 0) {
@@ -485,27 +589,62 @@ function renderCountdown() {
 /* =========================================================
    從 Gist 讀取下班時間
    ========================================================= */
-async function loadOffTime() {
+function parseClockin(data, nowMs) {
+  if (!data || typeof data !== "object" || !/^\d{4}-\d{2}-\d{2}$/.test(data.date)) {
+    throw new Error("打卡日期格式錯誤，應為 yyyy-MM-dd");
+  }
+  function minutes(value) {
+    const match = typeof value === "string" && value.trim().match(/^(\d{2}):?(\d{2})$/);
+    if (!match || Number(match[1]) > 23 || Number(match[2]) > 59) throw new Error("打卡時間格式錯誤");
+    return Number(match[1]) * 60 + Number(match[2]);
+  }
+  const leave = minutes(data.leave_time);
+  const start = minutes(data.first_clock_in);
+  const midnight = Date.parse(`${data.date}T00:00:00+08:00`);
+  if (!Number.isFinite(midnight) || new Date(midnight + 28800000).toISOString().slice(0,10) !== data.date) {
+    throw new Error("打卡日期無效");
+  }
+  const timestamp = midnight + (leave + (leave < start ? 1440 : 0)) * 60000;
+  const todayString = new Date(nowMs + 28800000).toISOString().slice(0,10);
+  const yesterdayString = new Date(nowMs + 28800000 - 86400000).toISOString().slice(0,10);
+  if (data.date !== todayString && !(data.date === yesterdayString && timestamp > nowMs)) {
+    throw new Error("今日尚未打卡");
+  }
+  return {hh: Math.floor(leave / 60), mm: leave % 60, timestamp};
+}
+
+async function loadOffTime(manual = false) {
+  if (isLoading) return;
+  isLoading = true;
+  const button = document.getElementById("refreshButton");
+  const status = document.getElementById("actionStatus");
+  const clockIn = document.getElementById("clockIn");
+  button.disabled = true;
+  button.textContent = "更新中…";
+  if (manual) status.textContent = "正在讀取最新打卡資料…";
+  const abort = new AbortController();
+  const timeout = setTimeout(() => abort.abort(), 15000);
   const offTime = document.getElementById("offTime");
   const countdown = document.getElementById("countdown");
   const updated = document.getElementById("updated");
 
   try {
     const response = await fetch(`${GIST_RAW}?t=${Date.now()}`, {
-      cache:"no-store"
+      cache:"no-store",
+      signal:abort.signal
     });
 
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
-    const text = (await response.text()).trim();
-    const match = text.match(/^(\d{2})(\d{2})$/);
-
-    if (!match) throw new Error("Gist 必須是 4 碼 HHMM");
-
-    const hh = Number(match[1]);
-    const mm = Number(match[2]);
-
-    if (hh > 23 || mm > 59) throw new Error("時間格式錯誤");
+    const data = await response.json();
+    const parsed = parseClockin(data, Date.now());
+    const hh = parsed.hh;
+    const mm = parsed.mm;
+    offTimestamp = parsed.timestamp;
+    recordDate = data.date;
+    const startText = data.first_clock_in.trim().replace(":", "");
+    const nextDay = new Date(offTimestamp + 28800000).toISOString().slice(0,10) !== data.date;
+    clockIn.textContent = `${data.date} 上班 ${startText.slice(0,2)}:${startText.slice(2)}${nextDay ? " · 隔天下班" : ""}`;
 
     offHour = hh;
     offMinute = mm;
@@ -520,15 +659,52 @@ async function loadOffTime() {
       `更新於 ${String(now.hour).padStart(2,"0")}:${String(now.minute).padStart(2,"0")}`;
 
     countdown.classList.remove("error");
+    if (manual) status.textContent = "已更新為最新資料";
 
   } catch (err) {
+    offHour = offMinute = offTimestamp = null;
+    clockIn.textContent = "";
     offTime.textContent = "--:--";
-    countdown.textContent = "暫時無法讀取下班時間";
+    countdown.textContent = err.message === "今日尚未打卡" ? err.message : "暫時無法讀取下班時間";
     countdown.classList.add("error");
-    updated.textContent = "";
+    updated.textContent = err.message;
+    if (manual) status.textContent = err.name === "AbortError" ? "連線逾時，請再試一次" : "更新失敗，請查看上方訊息";
     console.error(err);
+  } finally {
+    clearTimeout(timeout);
+    isLoading = false;
+    button.disabled = false;
+    button.textContent = "↻ 立即更新";
   }
 }
+
+
+document.getElementById("refreshButton").addEventListener("click", () => loadOffTime(true));
+document.getElementById("themeButton").addEventListener("click", () => {
+  selectedTheme = THEMES[(THEMES.indexOf(selectedTheme) + 1) % THEMES.length];
+  applyTheme();
+  renderCountdown();
+  document.getElementById("actionStatus").textContent = `已切換為 ${themeName.textContent} 風格`;
+});
+document.getElementById("shareButton").addEventListener("click", async () => {
+  const url = "https://beidandow.github.io/work-time/";
+  const status = document.getElementById("actionStatus");
+  try {
+    if (navigator.share) {
+      await navigator.share({title:"今天幾點下班？", url});
+      status.textContent = "已完成分享操作";
+    } else if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(url);
+      status.textContent = "連結已複製，可以貼給朋友";
+    } else {
+      window.prompt("請複製連結分享給朋友", url);
+    }
+  } catch (error) {
+    if (error.name === "AbortError") return;
+    status.textContent = "請手動複製連結";
+    window.prompt("請複製連結分享給朋友", url);
+  }
+});
 
 loadOffTime();
 
