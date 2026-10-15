@@ -1,0 +1,57 @@
+name: Set today activity
+
+on:
+  workflow_dispatch:
+    inputs:
+      activity:
+        description: Choose today activity
+        required: true
+        type: choice
+        options:
+          - mahjong
+          - gym
+          - pass
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Save activity for Taiwan date
+        env:
+          ACTIVITY: ${{ inputs.activity }}
+        run: |
+          python3 - <<'PY'
+          import os, json
+          from datetime import datetime, timezone, timedelta
+          from pathlib import Path
+          activity = os.environ["ACTIVITY"]
+          if activity not in {"mahjong", "gym", "pass"}:
+              raise ValueError("Invalid activity")
+          now = datetime.now(timezone(timedelta(hours=8)))
+          content = {
+              "date": now.date().isoformat(),
+              "activity": activity,
+              "updated_at": now.isoformat(),
+          }
+          Path("today-status.json").write_text(
+              json.dumps(content, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+          )
+          PY
+      - name: Commit published activity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add today-status.json
+          if git diff --cached --quiet; then
+            echo "No changes to publish"
+            exit 0
+          fi
+          git commit -m "Update today activity from Actions"
+          git push origin HEAD:main
