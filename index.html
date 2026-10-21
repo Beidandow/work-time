@@ -355,6 +355,21 @@ body.bluelan {
 .actions button:active { transform:scale(.96); }
 .actions button:focus-visible { outline:3px solid currentColor; outline-offset:4px; }
 .actions button:disabled { opacity:.5; cursor:wait; }
+.theme-picker[hidden] { display:none; }
+.theme-picker {
+  display:grid; grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:8px; width:min(100%,380px); margin:12px auto 0;
+}
+.theme-picker button {
+  min-height:44px; padding:10px 5px; border:1px solid currentColor;
+  border-radius:10px; background:transparent; color:inherit;
+  font:inherit; font-size:13px; cursor:pointer; opacity:.7;
+}
+.theme-picker button[aria-pressed="true"] {
+  opacity:1; font-weight:700; background:rgba(128,128,128,.2);
+}
+.theme-picker button:focus-visible { outline:3px solid currentColor; outline-offset:2px; }
+@media (max-width:350px) { .theme-picker { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 .clock-in, .action-status { font-size:13px; line-height:1.6; }
 .clock-in { margin:16px 0 0; opacity:.7; }
 .action-status { margin:10px 0 0; min-height:1.6em; }
@@ -432,9 +447,11 @@ body.circuit { background:#061b17; color:#d8ffe8; }
     <p class="clock-in" id="clockIn"></p>
     <div class="actions" role="group" aria-label="網頁操作">
       <button type="button" id="refreshButton">↻ 立即更新</button>
-      <button type="button" id="themeButton">◐ 切換風格</button>
+      <button type="button" id="themeButton">◐ 下個風格</button>
+      <button type="button" id="pickThemeButton" aria-controls="themePicker" aria-expanded="false">☷ 選擇風格</button>
       <button type="button" id="shareButton">↗ 分享連結</button>
     </div>
+    <div class="theme-picker" id="themePicker" role="group" aria-label="選擇網頁風格" hidden></div>
     <p class="action-status" id="actionStatus" role="status" aria-live="polite"></p>
     <p class="extra" id="extra"></p>
     <p class="credit" id="credit"></p>
@@ -627,6 +644,7 @@ async function loadOffTime(manual = false) {
   const offTime = document.getElementById("offTime");
   const countdown = document.getElementById("countdown");
   const updated = document.getElementById("updated");
+  let fetchedData = false;
 
   try {
     const response = await fetch(`${GIST_RAW}?t=${Date.now()}`, {
@@ -637,6 +655,10 @@ async function loadOffTime(manual = false) {
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
     const data = await response.json();
+    fetchedData = true;
+    window.worktimeLastData = data;
+    window.worktimeFetchFailed = false;
+    window.dispatchEvent(new CustomEvent("worktime:data", {detail:data}));
     const parsed = parseClockin(data, Date.now());
     const hh = parsed.hh;
     const mm = parsed.mm;
@@ -662,6 +684,10 @@ async function loadOffTime(manual = false) {
     if (manual) status.textContent = "已更新為最新資料";
 
   } catch (err) {
+    if (!fetchedData) {
+      window.worktimeFetchFailed = true;
+      window.dispatchEvent(new Event("worktime:network-error"));
+    }
     offHour = offMinute = offTimestamp = null;
     clockIn.textContent = "";
     offTime.textContent = "--:--";
@@ -679,11 +705,47 @@ async function loadOffTime(manual = false) {
 }
 
 
+// 快速選擇六種風格；原本的「下個風格」仍可一鍵循環。
+const themePicker = document.getElementById("themePicker");
+const pickThemeButton = document.getElementById("pickThemeButton");
+const themeLabels = {
+  depp:"電影", minimal:"極簡", cyber:"科技",
+  retro:"復古", bluelan:"藍調", circuit:"電路板"
+};
+function syncThemePicker() {
+  for (const button of themePicker.querySelectorAll("button[data-theme]")) {
+    button.setAttribute("aria-pressed", String(button.dataset.theme === selectedTheme));
+  }
+}
+for (const theme of THEMES) {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.dataset.theme = theme;
+  button.textContent = themeLabels[theme];
+  button.addEventListener("click", () => {
+    selectedTheme = theme;
+    applyTheme();
+    renderCountdown();
+    syncThemePicker();
+    themePicker.hidden = true;
+    pickThemeButton.setAttribute("aria-expanded", "false");
+    document.getElementById("actionStatus").textContent = `已切換為${button.textContent}風格`;
+  });
+  themePicker.appendChild(button);
+}
+syncThemePicker();
+pickThemeButton.addEventListener("click", () => {
+  themePicker.hidden = !themePicker.hidden;
+  pickThemeButton.setAttribute("aria-expanded", String(!themePicker.hidden));
+  if (!themePicker.hidden) syncThemePicker();
+});
+
 document.getElementById("refreshButton").addEventListener("click", () => loadOffTime(true));
 document.getElementById("themeButton").addEventListener("click", () => {
   selectedTheme = THEMES[(THEMES.indexOf(selectedTheme) + 1) % THEMES.length];
   applyTheme();
   renderCountdown();
+  syncThemePicker();
   document.getElementById("actionStatus").textContent = `已切換為 ${themeName.textContent} 風格`;
 });
 document.getElementById("shareButton").addEventListener("click", async () => {
@@ -708,9 +770,18 @@ document.getElementById("shareButton").addEventListener("click", async () => {
 
 loadOffTime();
 
-/* 倒數每分鐘更新；Gist 每 30 秒重新抓取 */
+/* 倒數每分鐘更新；可見時每 30 秒同步一次 Gist，節省手機背景流量。 */
 setInterval(renderCountdown, 60 * 1000);
-setInterval(loadOffTime, 30 * 1000);
+setInterval(() => {
+  if (!document.hidden) loadOffTime();
+}, 30 * 1000);
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden) {
+    renderCountdown();
+    loadOffTime();
+  }
+});
+window.addEventListener("online", () => loadOffTime());
 </script>
 <script src="activity.js" defer></script>
 </body>
