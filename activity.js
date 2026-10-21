@@ -54,9 +54,16 @@
     everLoaded = true;
     const activityDate = typeof data.activity_date === "string"
       ? data.activity_date : data.date;
-    const hasTodayActivity = activityDate === todayInTaiwan() &&
-      Object.prototype.hasOwnProperty.call(labels, data.activity);
-    value.textContent = hasTodayActivity ? labels[data.activity] : "今天尚未公告";
+    // 支援既有預設值 mahjong/gym/pass，也支援捷徑直接送出的自訂文字。
+    // 內容一律用 textContent 呈現，避免把使用者輸入當作 HTML 執行。
+    const rawActivity = typeof data.activity === "string"
+      ? data.activity.replace(/[\u0000-\u001f\u007f]/g, " ").trim()
+      : "";
+    const isPreset = Object.prototype.hasOwnProperty.call(labels, rawActivity);
+    const activityText = isPreset ? labels[rawActivity]
+      : (rawActivity.length > 0 && rawActivity.length <= 80 ? rawActivity : "");
+    const hasTodayActivity = activityDate === todayInTaiwan() && Boolean(activityText);
+    value.textContent = hasTodayActivity ? activityText : "今天尚未公告";
     section.dataset.state = hasTodayActivity ? "active" : "empty";
     const now = new Intl.DateTimeFormat("zh-TW", {
       timeZone:"Asia/Taipei", hour:"2-digit", minute:"2-digit", hourCycle:"h23"
