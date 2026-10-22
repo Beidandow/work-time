@@ -1,5 +1,7 @@
 # Work Time｜打卡與今日行程公告
 
+**現有 ClockIn 截圖對照修改：** [逐步動作、保留首次打卡、PATCH 詞典結構及驗收](docs/clockin-shortcuts.md)。同日「保留第一次打卡」需將儲存時間指定回 `ClockInTime`、`LeaveTime`，並移除該分支的「停止此捷徑」，才能繼續更新行程。
+
 GitHub Pages： https://beidandow.github.io/work-time/
 
 ## 架構

@@ -35,6 +35,7 @@
   const value = section.querySelector("#todayActivityValue");
   const sync = section.querySelector("#activitySync");
   let everLoaded = false;
+  let lastData = null;
 
   function todayInTaiwan() {
     const parts = new Intl.DateTimeFormat("en-CA", {
@@ -52,6 +53,7 @@
   function render(data) {
     if (!data || typeof data !== "object") return;
     everLoaded = true;
+    lastData = data;
     const activityDate = typeof data.activity_date === "string"
       ? data.activity_date : data.date;
     // 支援既有預設值 mahjong/gym/pass，也支援捷徑直接送出的自訂文字。
@@ -72,6 +74,8 @@
   }
 
   function showNetworkError() {
+    // 即使離線，也不能讓昨天的行程在午夜後繼續顯示。
+    if (lastData) render(lastData);
     if (!everLoaded) {
       value.textContent = "公告暫時無法讀取";
       section.dataset.state = "error";
@@ -87,4 +91,18 @@
   // activity.js 以 defer 載入：避免在腳本下載期間錯過首筆資料。
   if (window.worktimeLastData) render(window.worktimeLastData);
   else if (window.worktimeFetchFailed) showNetworkError();
+
+  function expirePreviousDay() {
+    if (!lastData) return;
+    const activityDate = typeof lastData.activity_date === "string"
+      ? lastData.activity_date : lastData.date;
+    if (activityDate !== todayInTaiwan()) {
+      value.textContent = "今天尚未公告";
+      section.dataset.state = "empty";
+    }
+  }
+  setInterval(expirePreviousDay, 60 * 1000);
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) expirePreviousDay();
+  });
 })();
