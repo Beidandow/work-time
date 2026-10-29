@@ -475,7 +475,7 @@ body[data-off-duty=true] #progressTrack::after{display:none}
       <button type="button" id="refreshButton">↻ 立即更新</button>
       <button type="button" id="themeButton">◐ 下個風格</button>
       <button type="button" id="pickThemeButton" aria-controls="themePicker" aria-expanded="false">☷ 選擇風格</button>
-      <button type="button" id="motionButton" aria-pressed="false">暫停動畫</button><button type="button" id="previewAnimationButton">🎉 預覽下班動畫</button><button type="button" id="cheerButton">為今天加油 ✦</button><button type="button" id="shareButton">↗ 分享連結</button>
+      <button type="button" id="motionButton" aria-pressed="false">暫停動畫</button><button type="button" id="previewAnimationButton">🎉 預覽下班動畫</button><button type="button" id="shareButton">↗ 分享連結</button>
     </div>
     <div class="theme-picker" id="themePicker" role="group" aria-label="選擇網頁風格" hidden></div>
     <p class="action-status" id="actionStatus" role="status" aria-live="polite"></p>
@@ -850,7 +850,6 @@ document.getElementById("shareButton").addEventListener("click", async () => {
 const motionButton=document.getElementById("motionButton");let motionOff=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 function setMotion(){document.documentElement.dataset.motion=motionOff?"off":"on";motionButton.textContent=motionOff?"開啟動畫":"暫停動畫";motionButton.setAttribute("aria-pressed",String(motionOff));}
 setMotion();motionButton.onclick=()=>{motionOff=!motionOff;setMotion();if(motionOff){document.getElementById("confettiLayer")?.remove();document.getAnimations().forEach(a=>a.cancel());}};
-document.getElementById("cheerButton").onclick=()=>{const messages=["今天也辛苦了，先放鬆一下肩膀。","又完成一小段，離收工更近了。","記得儲存進度，讓明天的自己輕鬆一點。"];document.getElementById("actionStatus").textContent=messages[Math.floor(Math.random()*messages.length)];if(!motionOff&&!window.matchMedia("(prefers-reduced-motion: reduce)").matches)document.querySelector(".card").animate([{transform:"scale(1)"},{transform:"scale(1.015)"},{transform:"scale(1)"}],{duration:350});};
 document.getElementById("previewAnimationButton").onclick=()=>{
   document.getElementById("actionStatus").textContent=animationsEnabled()?"下班彩紙動畫預覽 ✦": "動畫已暫停，請先開啟動畫；若系統啟用減少動態效果，請先關閉該設定。";
   burstConfetti();
