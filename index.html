@@ -4,7 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#08090c">
-<title>下班時間 2.0｜今天幾點下班？</title>
+<title>下班3.0｜今天幾點下班？</title>
+<meta property="og:title" content="下班3.0｜今天幾點下班？">
+<meta property="og:description" content="即時下班倒數、工時進度與今日行程。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://beidandow.github.io/work-time/">
 
 <style>
 * { box-sizing:border-box; }
@@ -511,7 +515,7 @@ function applyTheme() {
   credit.textContent = "";
 const today = taipeiParts();
 const dateText = `${today.month}/${today.day}`;
-document.title = `下班時間 2.0｜${dateText} 幾點下班？`;
+document.title = `下班3.0｜${dateText} 幾點下班？`;
 
 if (selectedTheme === "depp") {
   hero.hidden = false;
@@ -828,7 +832,7 @@ document.getElementById("shareButton").addEventListener("click", async () => {
   const status = document.getElementById("actionStatus");
   try {
     if (navigator.share) {
-      await navigator.share({title:"今天幾點下班？", url});
+      await navigator.share({title:"下班3.0｜今天幾點下班？", url});
       status.textContent = "已完成分享操作";
     } else if (navigator.clipboard && window.isSecureContext) {
       await navigator.clipboard.writeText(url);
