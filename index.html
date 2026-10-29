@@ -434,6 +434,22 @@ body.circuit { background:#061b17; color:#d8ffe8; }
 .card{animation:cardEnter .6s ease-out}.hero img{animation:heroBreathe 20s ease-in-out infinite alternate}#offGreeting{font-size:17px;line-height:1.7}body[data-off-duty=true] #offGreeting{animation:cardEnter .8s ease-out}
 @keyframes ambientDrift{to{transform:translate(6%,4%) rotate(8deg)}}@keyframes heroBreathe{to{transform:scale(1.035)}}@keyframes cardEnter{from{opacity:.5;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 html[data-motion=off] *,html[data-motion=off] *::after{animation:none!important;transition:none!important}@media(prefers-reduced-motion:reduce){*,*::after{animation:none!important;transition:none!important}}
+.countdown-caption{display:block;font-size:13px;letter-spacing:.12em;opacity:.7;margin-bottom:12px}
+.flip-clock{display:flex;justify-content:center;align-items:center;gap:4px}
+.flip-digit{position:relative;display:inline-block;min-width:1.05em;padding:.3em .08em;border:1px solid #8885;border-radius:7px;background:linear-gradient(180deg,#8883 49%,#0002 50%,#8882 52%);box-shadow:0 4px 0 #0002;font:700 clamp(23px,7vw,34px)/1.2 ui-monospace,monospace;transform-origin:50% 50%;backface-visibility:hidden}
+.flip-separator{opacity:.6;font-size:24px;padding:0 1px}
+#progressTrack{position:relative;overflow:hidden;border-radius:8px;height:10px;background:#8883}
+#workProgress{display:block;appearance:none;-webkit-appearance:none;border:0;height:10px;background:transparent;border-radius:8px;overflow:hidden}
+#workProgress::-webkit-progress-bar{background:transparent}
+#workProgress::-webkit-progress-value{background:currentColor;border-radius:8px;transition:width 1s linear}
+#workProgress::-moz-progress-bar{background:currentColor;border-radius:8px}
+#progressTrack::after{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(100deg,transparent 20%,#ffffffb0 48%,transparent 75%);width:45%;animation:progressFlow 2.2s linear infinite}
+body[data-off-duty=true] #progressTrack::after{display:none}
+@keyframes progressFlow{from{transform:translateX(-110%)}to{transform:translateX(330%)}}
+#confettiLayer{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:100}
+#confettiLayer i{position:absolute;top:-20px;width:9px;height:15px;border-radius:2px;animation:confettiFall 3s ease-in forwards}
+@keyframes confettiFall{from{transform:translate3d(0,-20px,0) rotate(0deg)}to{transform:translate3d(var(--drift),110vh,0) rotate(var(--spin));opacity:.2}}
+
 </style>
 </head>
 
@@ -450,12 +466,12 @@ html[data-motion=off] *,html[data-motion=off] *::after{animation:none!important;
     <h1 class="time" id="offTime">--:--</h1>
     <p class="countdown" id="countdown">讀取中…</p>
     <p class="updated" id="updated"></p>
-    <p class="clock-in" id="clockIn"></p><div id="liveProgress" hidden><progress id="workProgress" max="100" value="0" aria-label="工時進度"></progress><p id="progressText"></p></div><p id="offGreeting" aria-live="polite"></p>
+    <p class="clock-in" id="clockIn"></p><div id="liveProgress" hidden><div id="progressTrack"><progress id="workProgress" max="100" value="0" aria-label="工時進度"></progress></div><p id="progressText"></p></div><p id="offGreeting" aria-live="polite"></p>
     <div class="actions" role="group" aria-label="網頁操作">
       <button type="button" id="refreshButton">↻ 立即更新</button>
       <button type="button" id="themeButton">◐ 下個風格</button>
       <button type="button" id="pickThemeButton" aria-controls="themePicker" aria-expanded="false">☷ 選擇風格</button>
-      <button type="button" id="motionButton" aria-pressed="false">暫停動畫</button><button type="button" id="cheerButton">為今天加油 ✦</button><button type="button" id="shareButton">↗ 分享連結</button>
+      <button type="button" id="motionButton" aria-pressed="false">暫停動畫</button><button type="button" id="previewAnimationButton">🎉 預覽下班動畫</button><button type="button" id="cheerButton">為今天加油 ✦</button><button type="button" id="shareButton">↗ 分享連結</button>
     </div>
     <div class="theme-picker" id="themePicker" role="group" aria-label="選擇網頁風格" hidden></div>
     <p class="action-status" id="actionStatus" role="status" aria-live="polite"></p>
@@ -572,7 +588,63 @@ function taipeiParts() {
 /* =========================================================
    倒數
    ========================================================= */
-function resetMotionStatus(){document.getElementById("liveProgress").hidden=true;document.getElementById("offGreeting").textContent="";document.body.dataset.offDuty="false";}
+// Countdown digits retain their DOM nodes so only changed digits flip.
+function paintCountdown(remaining, hh, mm, ss) {
+  const host = document.getElementById('countdown');
+  if (!remaining) { host.removeAttribute("aria-label"); host.textContent = '今天下班了'; return; }
+  if (!host.querySelector('.flip-clock')) {
+    host.innerHTML = '<span class="countdown-caption">距離下班</span><span class="flip-clock" aria-hidden="true"></span>';
+  }
+  host.setAttribute('aria-label', `距離下班 ${hh} 小時 ${mm} 分 ${ss} 秒`);
+  const clock = host.querySelector('.flip-clock');
+  const value = `${hh}:${mm}:${ss}`;
+  if (clock.children.length !== value.length) {
+    clock.replaceChildren(...Array.from(value, c => {
+      const span = document.createElement('span');
+      span.className = c === ':' ? 'flip-separator' : 'flip-digit';
+      span.textContent = c;
+      return span;
+    }));
+  }
+  Array.from(value).forEach((c, i) => {
+    const digit = clock.children[i];
+    if (digit.textContent === c) return;
+    digit.textContent = c;
+    if (animationsEnabled()) digit.animate([
+      {transform:'perspective(180px) rotateX(-75deg)', opacity:.35},
+      {transform:'perspective(180px) rotateX(12deg)', opacity:1, offset:.75},
+      {transform:'perspective(180px) rotateX(0deg)', opacity:1}
+    ], {duration:420, easing:'ease-out'});
+  });
+}
+function animationsEnabled() {
+  return document.documentElement.dataset.motion !== 'off' &&
+    !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+const celebratedShifts = new Set();
+function celebrateShift(remaining) {
+  const key = `${recordDate}:${offTimestamp}`;
+  if (remaining || celebratedShifts.has(key)) return;
+  celebratedShifts.add(key);
+  burstConfetti();
+}
+function burstConfetti() {
+  if (!animationsEnabled() || document.hidden) return;
+  document.getElementById('confettiLayer')?.remove();
+  const layer = document.createElement('div');
+  layer.id = 'confettiLayer';
+  layer.setAttribute('aria-hidden', 'true');
+  const colors = ['#ffbd59','#76d5ff','#b49aff','#ff83a8','#7ce5ae'];
+  for (let i = 0; i < 64; i++) {
+    const piece = document.createElement('i');
+    piece.style.cssText = `left:${Math.random()*100}%;background:${colors[i%colors.length]};--drift:${Math.random()*240-120}px;--spin:${Math.random()*1000-500}deg;animation-delay:${Math.random()*.6}s;animation-duration:${2.3+Math.random()*1.2}s`;
+    layer.appendChild(piece);
+  }
+  document.body.appendChild(layer);
+  setTimeout(() => layer.remove(), 4500);
+}
+
+function resetMotionStatus(){document.getElementById("countdown").removeAttribute("aria-label");document.getElementById("liveProgress").hidden=true;document.getElementById("offGreeting").textContent="";document.body.dataset.offDuty="false";}
 function renderCountdown() {
   if (offHour === null || offMinute === null) return;
 
@@ -590,7 +662,8 @@ function renderCountdown() {
   }
   const remaining=Math.max(0,Math.ceil((offTimestamp-Date.now())/1000));
   const hh=String(Math.floor(remaining/3600)).padStart(2,"0"),mm=String(Math.floor(remaining%3600/60)).padStart(2,"0"),ss=String(remaining%60).padStart(2,"0");
-  document.getElementById("countdown").textContent=remaining?`距離下班 ${hh}:${mm}:${ss}`:"今天下班了";
+  paintCountdown(remaining,hh,mm,ss);
+  celebrateShift(remaining);
   const raw=window.worktimeLastData?.first_clock_in?.replace(":","");
   if(raw&&/^\d{4}$/.test(raw)){
     const begin=Date.parse(recordDate+"T00:00:00+08:00")+(Number(raw.slice(0,2))*60+Number(raw.slice(2)))*60000;
@@ -772,8 +845,12 @@ document.getElementById("shareButton").addEventListener("click", async () => {
 
 const motionButton=document.getElementById("motionButton");let motionOff=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 function setMotion(){document.documentElement.dataset.motion=motionOff?"off":"on";motionButton.textContent=motionOff?"開啟動畫":"暫停動畫";motionButton.setAttribute("aria-pressed",String(motionOff));}
-setMotion();motionButton.onclick=()=>{motionOff=!motionOff;setMotion();};
+setMotion();motionButton.onclick=()=>{motionOff=!motionOff;setMotion();if(motionOff){document.getElementById("confettiLayer")?.remove();document.getAnimations().forEach(a=>a.cancel());}};
 document.getElementById("cheerButton").onclick=()=>{const messages=["今天也辛苦了，先放鬆一下肩膀。","又完成一小段，離收工更近了。","記得儲存進度，讓明天的自己輕鬆一點。"];document.getElementById("actionStatus").textContent=messages[Math.floor(Math.random()*messages.length)];if(!motionOff&&!window.matchMedia("(prefers-reduced-motion: reduce)").matches)document.querySelector(".card").animate([{transform:"scale(1)"},{transform:"scale(1.015)"},{transform:"scale(1)"}],{duration:350});};
+document.getElementById("previewAnimationButton").onclick=()=>{
+  document.getElementById("actionStatus").textContent=animationsEnabled()?"下班彩紙動畫預覽 ✦": "動畫已暫停，請先開啟動畫；若系統啟用減少動態效果，請先關閉該設定。";
+  burstConfetti();
+};
 loadOffTime();
 
 /* 倒數每秒更新；可見時每 30 秒同步一次 Gist，節省手機背景流量。 */
