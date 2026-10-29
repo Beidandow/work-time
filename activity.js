@@ -28,7 +28,7 @@
   section.innerHTML = [
     '<h2>今日行程公告</h2>',
     '<p class="current-status" id="todayActivityValue" aria-live="polite">讀取中…</p>',
-    '<p class="help" id="activitySync">網頁開啟時每 30 秒自動同步 · 訪客僅能查看</p>'
+    '<p class="help" id="activitySync">網頁開啟時每 30 秒自動同步</p>'
   ].join("");
   anchor.insertAdjacentElement("beforebegin", section);
 
@@ -70,7 +70,7 @@
     const now = new Intl.DateTimeFormat("zh-TW", {
       timeZone:"Asia/Taipei", hour:"2-digit", minute:"2-digit", hourCycle:"h23"
     }).format(new Date());
-    sync.textContent = `同步於 ${now} · 僅本人可透過 iPhone 捷徑設定`;
+    sync.textContent = `同步於 ${now}`;
   }
 
   function showNetworkError() {
