@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#08090c">
-<title>今天幾點下班？</title>
+<title>下班時間 2.0｜今天幾點下班？</title>
 
 <style>
 * { box-sizing:border-box; }
@@ -428,6 +428,12 @@ body.circuit { background:#061b17; color:#d8ffe8; }
   margin:22px 0 0; padding-top:18px; border-top:1px dashed #63734b;
   color:#9eae88; font:11px/1.7 Consolas,monospace; letter-spacing:.12em;
 }
+
+#liveProgress{margin:24px 0}#workProgress{width:100%;height:8px;accent-color:currentColor}#progressText{font-size:13px;opacity:.75}.countdown{font-variant-numeric:tabular-nums;min-height:1.7em}
+.page::after{content:"";position:fixed;inset:-30%;pointer-events:none;background:radial-gradient(ellipse at 30% 30%,#619fff18,transparent 45%),radial-gradient(ellipse at 70% 70%,#7affa518,transparent 50%);animation:ambientDrift 18s ease-in-out infinite alternate;z-index:0}
+.card{animation:cardEnter .6s ease-out}.hero img{animation:heroBreathe 20s ease-in-out infinite alternate}#offGreeting{font-size:17px;line-height:1.7}body[data-off-duty=true] #offGreeting{animation:cardEnter .8s ease-out}
+@keyframes ambientDrift{to{transform:translate(6%,4%) rotate(8deg)}}@keyframes heroBreathe{to{transform:scale(1.035)}}@keyframes cardEnter{from{opacity:.5;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+html[data-motion=off] *,html[data-motion=off] *::after{animation:none!important;transition:none!important}@media(prefers-reduced-motion:reduce){*,*::after{animation:none!important;transition:none!important}}
 </style>
 </head>
 
@@ -444,12 +450,12 @@ body.circuit { background:#061b17; color:#d8ffe8; }
     <h1 class="time" id="offTime">--:--</h1>
     <p class="countdown" id="countdown">讀取中…</p>
     <p class="updated" id="updated"></p>
-    <p class="clock-in" id="clockIn"></p>
+    <p class="clock-in" id="clockIn"></p><div id="liveProgress" hidden><progress id="workProgress" max="100" value="0" aria-label="工時進度"></progress><p id="progressText"></p></div><p id="offGreeting" aria-live="polite"></p>
     <div class="actions" role="group" aria-label="網頁操作">
       <button type="button" id="refreshButton">↻ 立即更新</button>
       <button type="button" id="themeButton">◐ 下個風格</button>
       <button type="button" id="pickThemeButton" aria-controls="themePicker" aria-expanded="false">☷ 選擇風格</button>
-      <button type="button" id="shareButton">↗ 分享連結</button>
+      <button type="button" id="motionButton" aria-pressed="false">暫停動畫</button><button type="button" id="cheerButton">為今天加油 ✦</button><button type="button" id="shareButton">↗ 分享連結</button>
     </div>
     <div class="theme-picker" id="themePicker" role="group" aria-label="選擇網頁風格" hidden></div>
     <p class="action-status" id="actionStatus" role="status" aria-live="polite"></p>
@@ -489,7 +495,7 @@ function applyTheme() {
   credit.textContent = "";
 const today = taipeiParts();
 const dateText = `${today.month}/${today.day}`;
-document.title = `${dateText} 幾點下班？`;
+document.title = `下班時間 2.0｜${dateText} 幾點下班？`;
 
 if (selectedTheme === "depp") {
   hero.hidden = false;
@@ -566,6 +572,7 @@ function taipeiParts() {
 /* =========================================================
    倒數
    ========================================================= */
+function resetMotionStatus(){document.getElementById("liveProgress").hidden=true;document.getElementById("offGreeting").textContent="";document.body.dataset.offDuty="false";}
 function renderCountdown() {
   if (offHour === null || offMinute === null) return;
 
@@ -573,6 +580,7 @@ function renderCountdown() {
   const now = taipeiParts();
   const todayString = `${now.year}-${String(now.month).padStart(2,"0")}-${String(now.day).padStart(2,"0")}`;
   if (recordDate !== todayString && Date.now() >= offTimestamp) {
+    resetMotionStatus();
     offTimestamp = null;
     offHour = offMinute = null;
     document.getElementById("offTime").textContent = "--:--";
@@ -580,27 +588,20 @@ function renderCountdown() {
     document.getElementById("clockIn").textContent = "";
     return;
   }
-  const diff = Math.ceil((offTimestamp - Date.now()) / 60000);
-  const el = document.getElementById("countdown");
-
-  if (diff > 0) {
-    const h = Math.floor(diff / 60);
-    const m = diff % 60;
-
-    if (selectedTheme === "cyber") {
-      el.textContent = `T-${String(h).padStart(2,"0")}H ${String(m).padStart(2,"0")}M`;
-    } else if (h > 0 && m > 0) {
-      el.textContent = `還有 ${h} 小時 ${m} 分`;
-    } else if (h > 0) {
-      el.textContent = `還有 ${h} 小時`;
-    } else {
-      el.textContent = `還有 ${m} 分`;
+  const remaining=Math.max(0,Math.ceil((offTimestamp-Date.now())/1000));
+  const hh=String(Math.floor(remaining/3600)).padStart(2,"0"),mm=String(Math.floor(remaining%3600/60)).padStart(2,"0"),ss=String(remaining%60).padStart(2,"0");
+  document.getElementById("countdown").textContent=remaining?`距離下班 ${hh}:${mm}:${ss}`:"今天下班了";
+  const raw=window.worktimeLastData?.first_clock_in?.replace(":","");
+  if(raw&&/^\d{4}$/.test(raw)){
+    const begin=Date.parse(recordDate+"T00:00:00+08:00")+(Number(raw.slice(0,2))*60+Number(raw.slice(2)))*60000;
+    if(offTimestamp>begin){const percent=Math.max(0,Math.min(100,(Date.now()-begin)/(offTimestamp-begin)*100));
+      document.getElementById("liveProgress").hidden=false;document.getElementById("workProgress").value=percent;
+      document.getElementById("progressText").textContent=`今日工時 ${Math.floor(percent)}% · ${Date.now()<begin?"尚未上班":remaining?"進行中":"已完成"}`;
     }
-  } else if (diff === 0) {
-    el.textContent = selectedTheme === "cyber" ? "CLOCK_OUT READY" : "下班時間到了";
-  } else {
-    el.textContent = selectedTheme === "cyber" ? "STATUS : OFF DUTY" : "今天下班了";
   }
+  const greeting=document.getElementById("offGreeting"),text=remaining?"":"收工了，接下來是你的時間。";
+  if(greeting.textContent!==text)greeting.textContent=text;
+  document.body.dataset.offDuty=String(!remaining);
 }
 
 /* =========================================================
@@ -688,6 +689,7 @@ async function loadOffTime(manual = false) {
       window.worktimeFetchFailed = true;
       window.dispatchEvent(new Event("worktime:network-error"));
     }
+    resetMotionStatus();
     offHour = offMinute = offTimestamp = null;
     clockIn.textContent = "";
     offTime.textContent = "--:--";
@@ -768,10 +770,14 @@ document.getElementById("shareButton").addEventListener("click", async () => {
   }
 });
 
+const motionButton=document.getElementById("motionButton");let motionOff=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+function setMotion(){document.documentElement.dataset.motion=motionOff?"off":"on";motionButton.textContent=motionOff?"開啟動畫":"暫停動畫";motionButton.setAttribute("aria-pressed",String(motionOff));}
+setMotion();motionButton.onclick=()=>{motionOff=!motionOff;setMotion();};
+document.getElementById("cheerButton").onclick=()=>{const messages=["今天也辛苦了，先放鬆一下肩膀。","又完成一小段，離收工更近了。","記得儲存進度，讓明天的自己輕鬆一點。"];document.getElementById("actionStatus").textContent=messages[Math.floor(Math.random()*messages.length)];if(!motionOff&&!window.matchMedia("(prefers-reduced-motion: reduce)").matches)document.querySelector(".card").animate([{transform:"scale(1)"},{transform:"scale(1.015)"},{transform:"scale(1)"}],{duration:350});};
 loadOffTime();
 
-/* 倒數每分鐘更新；可見時每 30 秒同步一次 Gist，節省手機背景流量。 */
-setInterval(renderCountdown, 60 * 1000);
+/* 倒數每秒更新；可見時每 30 秒同步一次 Gist，節省手機背景流量。 */
+setInterval(() => { if (!document.hidden) renderCountdown(); }, 1000);
 setInterval(() => {
   if (!document.hidden) loadOffTime();
 }, 30 * 1000);
