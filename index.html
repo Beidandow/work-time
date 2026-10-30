@@ -454,6 +454,27 @@ body[data-off-duty=true] #progressTrack::after{display:none}
 #confettiLayer i{position:absolute;top:-20px;width:9px;height:15px;border-radius:2px;animation:confettiFall 3s ease-in forwards}
 @keyframes confettiFall{from{transform:translate3d(0,-20px,0) rotate(0deg)}to{transform:translate3d(var(--drift),110vh,0) rotate(var(--spin));opacity:.2}}
 
+
+/* Quiet travel themes: Thai gold and Japanese paper. */
+body.thailand{background:#123d35;color:#f7edcf}
+.thailand .page{background:radial-gradient(ellipse at 50% 0,#326c55 0,transparent 65%),#123d35}
+.thailand .page::before{content:"";position:absolute;bottom:0;left:0;right:0;height:190px;background:#c7a357;opacity:.12;clip-path:polygon(0 100%,0 85%,15% 85%,22% 65%,29% 85%,36% 85%,42% 60%,46% 60%,50% 8%,54% 60%,58% 60%,64% 85%,71% 85%,78% 65%,85% 85%,100% 85%,100% 100%)}
+.thailand .card{padding:48px 22px;border-top:1px solid #bca26b;border-bottom:1px solid #bca26b}
+.thailand .label{color:#e3ca91;letter-spacing:.16em;font-size:12px}
+.thailand .time{font-size:clamp(66px,21vw,100px);font-weight:500;letter-spacing:-.06em;margin:22px 0 28px}
+.thailand .actions button,.thailand .theme-picker button{border-color:#c0a97670;color:#f7edcf}
+body.japan{background:#f4f0e7;color:#302e2b}
+.japan .page{background:repeating-linear-gradient(0deg,#68523403 0 1px,transparent 1px 5px),#f4f0e7}
+.japan .card{padding:48px 22px}
+.japan .card::before{content:"";display:block;width:54px;height:54px;margin:0 auto 32px;border-radius:50%;background:#b74b3e}
+.japan .label{letter-spacing:.18em;font-size:12px;color:#635c53}
+.japan .time{font-size:clamp(66px,21vw,100px);font-weight:400;letter-spacing:-.06em;margin:22px 0 28px}
+.japan .actions button,.japan .theme-picker button{border-color:#b4ab9c;border-radius:4px}
+.japan .flip-digit{background:#ebe4d7;border:0;box-shadow:none;border-radius:3px}
+.japan #workProgress{color:#b74b3e}
+.thailand .updated,.japan .updated{margin-top:14px;opacity:.7}
+.thailand .page::after,.japan .page::after{display:none}
+.extra:empty,.credit:empty,.action-status:empty{display:none}
 </style>
 </head>
 
@@ -473,9 +494,8 @@ body[data-off-duty=true] #progressTrack::after{display:none}
     <p class="clock-in" id="clockIn"></p><div id="liveProgress" hidden><div id="progressTrack"><progress id="workProgress" max="100" value="0" aria-label="工時進度"></progress></div><p id="progressText"></p></div><p id="offGreeting" aria-live="polite"></p>
     <div class="actions" role="group" aria-label="網頁操作">
       <button type="button" id="refreshButton">↻ 立即更新</button>
-      <button type="button" id="themeButton">◐ 下個風格</button>
       <button type="button" id="pickThemeButton" aria-controls="themePicker" aria-expanded="false">☷ 選擇風格</button>
-      <button type="button" id="motionButton" aria-pressed="false">暫停動畫</button><button type="button" id="previewAnimationButton">🎉 預覽下班動畫</button><button type="button" id="shareButton">↗ 分享連結</button>
+      <button type="button" id="motionButton" aria-pressed="false">暫停動畫</button><button type="button" id="shareButton">↗ 分享連結</button>
     </div>
     <div class="theme-picker" id="themePicker" role="group" aria-label="選擇網頁風格" hidden></div>
     <p class="action-status" id="actionStatus" role="status" aria-live="polite"></p>
@@ -493,10 +513,11 @@ body[data-off-duty=true] #progressTrack::after{display:none}
 const GIST_RAW =
   "https://gist.githubusercontent.com/Beidandow/ae9a628b872d72ef0e019324ac6cadae/raw/clockin.json";
 
-const THEMES = ["depp", "minimal", "cyber", "retro", "bluelan", "circuit"];
+const THEMES = ["depp", "minimal", "cyber", "retro", "bluelan", "circuit", "thailand", "japan"];
 
 /* 每次載入網頁隨機抽一個 Theme */
-let selectedTheme = THEMES[Math.floor(Math.random() * THEMES.length)];
+const requestedTheme = new URLSearchParams(location.search).get("theme");
+let selectedTheme = THEMES.includes(requestedTheme) ? requestedTheme : THEMES[Math.floor(Math.random() * THEMES.length)];
 document.body.className = selectedTheme;
 
 /* Theme 個別文字與元素 */
@@ -559,6 +580,11 @@ if (selectedTheme === "bluelan") {
   themeName.textContent = "BLUE LAN";
 }
 
+if (selectedTheme === "thailand" || selectedTheme === "japan") {
+  label.textContent = `${dateText} · 下班時間`;
+  extra.textContent = "";
+  themeName.textContent = selectedTheme === "thailand" ? "THAILAND" : "JAPAN";
+}
 }
 applyTheme();
 
@@ -784,12 +810,12 @@ async function loadOffTime(manual = false) {
 }
 
 
-// 快速選擇六種風格；原本的「下個風格」仍可一鍵循環。
+// 快速選擇八種風格。
 const themePicker = document.getElementById("themePicker");
 const pickThemeButton = document.getElementById("pickThemeButton");
 const themeLabels = {
   depp:"電影", minimal:"極簡", cyber:"科技",
-  retro:"復古", bluelan:"藍調", circuit:"電路板"
+  retro:"復古", bluelan:"藍調", circuit:"電路板", thailand:"泰國", japan:"日本"
 };
 function syncThemePicker() {
   for (const button of themePicker.querySelectorAll("button[data-theme]")) {
@@ -820,13 +846,6 @@ pickThemeButton.addEventListener("click", () => {
 });
 
 document.getElementById("refreshButton").addEventListener("click", () => loadOffTime(true));
-document.getElementById("themeButton").addEventListener("click", () => {
-  selectedTheme = THEMES[(THEMES.indexOf(selectedTheme) + 1) % THEMES.length];
-  applyTheme();
-  renderCountdown();
-  syncThemePicker();
-  document.getElementById("actionStatus").textContent = `已切換為 ${themeName.textContent} 風格`;
-});
 document.getElementById("shareButton").addEventListener("click", async () => {
   const url = "https://beidandow.github.io/work-time/";
   const status = document.getElementById("actionStatus");
@@ -850,10 +869,6 @@ document.getElementById("shareButton").addEventListener("click", async () => {
 const motionButton=document.getElementById("motionButton");let motionOff=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 function setMotion(){document.documentElement.dataset.motion=motionOff?"off":"on";motionButton.textContent=motionOff?"開啟動畫":"暫停動畫";motionButton.setAttribute("aria-pressed",String(motionOff));}
 setMotion();motionButton.onclick=()=>{motionOff=!motionOff;setMotion();if(motionOff){document.getElementById("confettiLayer")?.remove();document.getAnimations().forEach(a=>a.cancel());}};
-document.getElementById("previewAnimationButton").onclick=()=>{
-  document.getElementById("actionStatus").textContent=animationsEnabled()?"下班彩紙動畫預覽 ✦": "動畫已暫停，請先開啟動畫；若系統啟用減少動態效果，請先關閉該設定。";
-  burstConfetti();
-};
 loadOffTime();
 
 /* 倒數每秒更新；可見時每 30 秒同步一次 Gist，節省手機背景流量。 */
