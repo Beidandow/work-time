@@ -508,11 +508,62 @@ html[data-motion=off] .japan-scene *,html[data-motion=off] .page *{animation-pla
 .thai-attribution a{color:inherit}
 @media(max-width:900px) and (min-width:601px){.thailand .thai-portrait{left:2%;width:100px}}
 @media(max-width:600px){.thailand .thai-portrait{top:14px;left:calc(50% - 40px);width:80px}.thai-portrait figcaption{font-size:9px}.thai-portrait img{border-width:4px}.thailand .page{background-image:url("assets/thailand-collage.webp")}}
+
+/* Hsinchu temple evening and a family-photo keepsake. */
+body.hsinchu{background:#281b25;color:#fff1d1}
+.hsinchu .page{background:#281b25 url("assets/hsinchu-temple.webp") center/cover fixed}
+.hsinchu .card{padding:32px 24px;margin:24px 0;background:rgba(38,18,24,.59);border:1px solid #e1b76690;border-radius:20px;box-shadow:0 20px 70px #13080c55;-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px)}
+.hsinchu .label{color:#f4d08d;font-size:13px;letter-spacing:.16em}
+.hsinchu .time{font-size:clamp(68px,21vw,100px);font-weight:500;letter-spacing:-.06em;margin:22px 0 28px}
+.hsinchu .updated{margin-top:14px;opacity:.75}
+.hsinchu .extra{font-size:13px;letter-spacing:.08em;margin:24px 0 0;color:#f4d08d}
+.hsinchu .actions button,.hsinchu .theme-picker button{border-color:#dab47380}
+.hsinchu-decor{display:none;position:absolute;inset:0;pointer-events:none;z-index:1}
+.hsinchu .hsinchu-decor{display:block}
+.lantern{position:absolute;top:35px;width:56px;height:76px;border:2px solid #edbd68;border-radius:45%;background:repeating-linear-gradient(90deg,transparent 0 12px,#ffbd6925 12px 14px),radial-gradient(ellipse,#f78143,#b72e2e);box-shadow:0 0 38px #ffac4840;transform-origin:50% -35px;animation:lanternSway 5s ease-in-out infinite alternate}
+.lantern::before{content:"";position:absolute;left:50%;bottom:100%;height:36px;width:1px;background:#edbd68}
+.lantern::after{content:"";position:absolute;top:100%;left:45%;width:6px;height:26px;background:#e3b65e}
+.lantern-left{left:9%}.lantern-right{right:9%;animation-delay:-2.5s}
+@keyframes lanternSway{from{transform:rotate(-6deg)}to{transform:rotate(6deg)}}
+body.nephew{background:#e3f2ef;color:#294b4c}
+.nephew .page{background:radial-gradient(ellipse at 15% 20%,#fff2c9 0,transparent 45%),radial-gradient(ellipse at 85% 80%,#f7dbe1 0,transparent 45%),#d8eeec}
+.nephew .page::after,.hsinchu .page::after{display:none}
+.nephew .card{margin:24px 0;padding:28px 24px;background:rgba(255,255,249,.58);border:1px solid #ffffffc0;border-radius:32px;box-shadow:0 14px 60px #527d6d20;-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px)}
+.nephew-photo{display:none;position:relative;width:170px;margin:0 auto 26px;padding:8px 8px 0;background:#fffdf7;border-radius:85px 85px 18px 18px;box-shadow:0 8px 22px #537a6c25;transform:rotate(-3deg)}
+.nephew .nephew-photo{display:block}
+.nephew-photo img{display:block;width:100%;height:auto;border-radius:77px 77px 10px 10px}
+.nephew-photo figcaption{font-size:11px;padding:9px 0;color:#52736e}
+.photo-star{position:absolute;right:-18px;top:8px;font-size:42px;color:#d99a2c;text-shadow:0 2px 0 #fff}
+.nephew .label{font-size:12px;letter-spacing:.16em;color:#4e706c}
+.nephew .time{font-size:clamp(64px,20vw,90px);font-weight:650;letter-spacing:-.06em;margin:16px 0 22px}
+.nephew .updated{margin-top:12px;opacity:.75}
+.nephew .flip-digit{background:#ffffff88;border-color:#9bbab84d;box-shadow:0 3px 0 #8baaa822;color:#315651}
+.nephew .actions button,.nephew .theme-picker button{border-color:#7ba29a80}
+.nephew .extra{font-size:12px;margin:20px 0 0;color:#52736e}
+.nephew-decor{display:none;position:fixed;inset:0;overflow:hidden;pointer-events:none}
+.nephew .nephew-decor{display:block}
+.nephew-decor span{position:absolute;font:90px/1 sans-serif;color:#c59338;animation:toyFloat 7s ease-in-out infinite alternate}
+.nephew-decor span:nth-child(1){top:12%;left:12%}
+.nephew-decor span:nth-child(2){top:35%;right:7%;color:#fffdf7;font-size:140px;animation-delay:-3s}
+.nephew-decor span:nth-child(3){bottom:13%;left:17%;color:#83b8b0;font-size:120px;animation-delay:-1s}
+.nephew-decor span:nth-child(4){top:14%;right:15%;color:#d596a3;animation-delay:-5s}
+.nephew-decor span:nth-child(5){bottom:12%;right:16%;font-size:65px;animation-delay:-2s}
+.nephew-decor span:nth-child(6){top:45%;left:5%;color:#fffdf7;font-size:140px;animation-delay:-4s}
+@keyframes toyFloat{from{transform:translateY(-8px) rotate(-8deg)}to{transform:translateY(12px) rotate(8deg)}}
+@media(max-width:600px){
+ .hsinchu .page{padding:65vw 16px 24px;background-size:100% auto;background-position:center top;background-attachment:scroll;background-repeat:no-repeat}
+ .hsinchu .card,.nephew .card{margin:0;padding:26px 18px}
+ .lantern{top:18px;width:28px;height:40px}.lantern::before{height:18px}.lantern::after{height:16px;width:3px}
+ .nephew .page{padding:24px 16px}.nephew-photo{width:148px}
+ .nephew-decor span{font-size:55px}
+}
 </style>
 </head>
 
 <body>
 <main class="page">
+<div class="hsinchu-decor" aria-hidden="true"><span class="lantern lantern-left"></span><span class="lantern lantern-right"></span></div>
+<div class="nephew-decor" aria-hidden="true"><span>✦</span><span>☁</span><span>✧</span><span>♡</span><span>✦</span><span>☁</span></div>
 <figure class="thai-portrait"><img src="assets/king-rama-x.webp" alt="泰皇拉瑪十世正式肖像"><figcaption>泰皇拉瑪十世</figcaption></figure>
 <div class="japan-scene" aria-hidden="true">
 <svg class="landscape" viewBox="0 0 1440 1000" preserveAspectRatio="xMidYMax slice">
@@ -531,6 +582,7 @@ html[data-motion=off] .japan-scene *,html[data-motion=off] .page *{animation-pla
   </section>
 
   <section class="card">
+<figure class="nephew-photo"><span class="photo-star" aria-hidden="true">✦</span><img src="assets/nephew-portrait.webp" alt="今天的小主角" width="326" height="425"><figcaption>今天也要開心收工</figcaption></figure>
     <p class="label" id="label">TODAY · 下班時間</p>
     <h1 class="time" id="offTime">--:--</h1>
     <p class="countdown" id="countdown">讀取中…</p>
@@ -557,7 +609,7 @@ html[data-motion=off] .japan-scene *,html[data-motion=off] .page *{animation-pla
 const GIST_RAW =
   "https://gist.githubusercontent.com/Beidandow/ae9a628b872d72ef0e019324ac6cadae/raw/clockin.json";
 
-const THEMES = ["depp", "minimal", "cyber", "retro", "bluelan", "circuit", "thailand", "japan"];
+const THEMES = ["depp", "minimal", "cyber", "retro", "bluelan", "circuit", "thailand", "japan", "hsinchu", "nephew"];
 
 /* 每次載入網頁隨機抽一個 Theme */
 const requestedTheme = new URLSearchParams(location.search).get("theme");
@@ -628,6 +680,11 @@ if (selectedTheme === "thailand" || selectedTheme === "japan") {
   label.textContent = `${dateText} · 下班時間`;
   extra.textContent = "";
   themeName.textContent = selectedTheme === "thailand" ? "THAILAND" : "JAPAN";
+}
+if (selectedTheme === "hsinchu" || selectedTheme === "nephew") {
+  label.textContent = `${dateText} · 下班時間`;
+  extra.textContent = selectedTheme === "hsinchu" ? "城隍廟口，等你收工。" : "今日主角 · 小可愛";
+  themeName.textContent = selectedTheme === "hsinchu" ? "HSINCHU" : "LITTLE STAR";
 }
 }
 applyTheme();
@@ -854,12 +911,12 @@ async function loadOffTime(manual = false) {
 }
 
 
-// 快速選擇八種風格。
+// 快速選擇十種風格。
 const themePicker = document.getElementById("themePicker");
 const pickThemeButton = document.getElementById("pickThemeButton");
 const themeLabels = {
   depp:"電影", minimal:"極簡", cyber:"科技",
-  retro:"復古", bluelan:"藍調", circuit:"電路板", thailand:"泰國", japan:"日本"
+  retro:"復古", bluelan:"藍調", circuit:"電路板", thailand:"泰國", japan:"日本", hsinchu:"新竹城隍廟", nephew:"小可愛"
 };
 function syncThemePicker() {
   for (const button of themePicker.querySelectorAll("button[data-theme]")) {
