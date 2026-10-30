@@ -475,11 +475,55 @@ body.japan{background:#f4f0e7;color:#302e2b}
 .thailand .updated,.japan .updated{margin-top:14px;opacity:.7}
 .thailand .page::after,.japan .page::after{display:none}
 .extra:empty,.credit:empty,.action-status:empty{display:none}
+
+/* Illustrated travel scenes, kept behind the live content. */
+.thailand .page{background:#123d35 url("assets/thailand-collage.webp") center/cover fixed}
+.thailand .page::before{display:none}
+.thailand .card{background:#092e29dd;border:1px solid #d5b66b70;border-radius:22px;box-shadow:0 18px 80px #001c2540;backdrop-filter:blur(9px);margin:24px 0;padding:32px 22px}
+.japan-scene{display:none;position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+.japan .japan-scene{display:block}
+.japan-scene .landscape{width:100%;height:100%}
+.japan .page{background:#e5d3ce}
+.japan .card{margin:24px 0;padding:32px 22px;background:#fffaf1df;border:1px solid #ffffffa0;border-radius:22px;backdrop-filter:blur(9px);box-shadow:0 18px 80px #554d6030}
+.japan .card::before{width:32px;height:32px;margin-bottom:20px}
+.jp-cloud{animation:japanCloud 24s ease-in-out infinite alternate}
+.petals i{position:absolute;top:-30px;left:var(--x);width:12px;height:19px;background:linear-gradient(135deg,#fff0f5,#eaa8bd);border-radius:80% 0 80% 30%;opacity:.85;animation:sakuraFall var(--duration) linear var(--delay) infinite}
+@keyframes sakuraFall{0%{transform:translate3d(0,-20px,0) rotate(0)}50%{transform:translate3d(var(--sway),50vh,0) rotate(180deg)}100%{transform:translate3d(-30px,105vh,0) rotate(400deg)}}
+@keyframes japanCloud{to{transform:translateX(90px)}}
+html[data-motion=off] .japan-scene *,html[data-motion=off] .page *{animation-play-state:paused!important}
+@media(prefers-reduced-motion:reduce){.petals{display:none}}
+@media(max-width:600px){
+ .thailand .page{padding:65vw 16px 30px;background-size:100% auto;background-position:center top;background-attachment:scroll;background-repeat:no-repeat}
+ .thailand .card,.japan .card{width:min(100%,430px);margin:0;padding:28px 18px}
+ .thailand .page{background-image:linear-gradient(to bottom,transparent 40vw,#123d35 67vw),url("assets/thailand-collage.webp")}
+ .japan .page{padding:120px 16px 30px}
+ .japan-scene .landscape{width:170%;max-width:none;margin-left:-35%}
+}
+
+.thai-portrait,.thai-attribution{display:none}
+.thailand .thai-portrait{display:block;position:absolute;top:7%;left:6%;width:clamp(100px,14vw,190px);margin:0;z-index:1;text-align:center}
+.thai-portrait img{display:block;width:100%;border:7px double #e5c477;border-radius:48% 48% 6px 6px;box-shadow:0 10px 35px #001a13aa}
+.thai-portrait figcaption{font-size:12px;margin-top:9px;color:#f7edcf;text-shadow:0 2px 8px #000}
+.thailand .thai-attribution{display:block;font-size:10px;line-height:1.7;opacity:.75;margin:18px 0 0}
+.thai-attribution a{color:inherit}
+@media(max-width:900px) and (min-width:601px){.thailand .thai-portrait{left:2%;width:100px}}
+@media(max-width:600px){.thailand .thai-portrait{top:14px;left:calc(50% - 40px);width:80px}.thai-portrait figcaption{font-size:9px}.thai-portrait img{border-width:4px}.thailand .page{background-image:url("assets/thailand-collage.webp")}}
 </style>
 </head>
 
 <body>
 <main class="page">
+<figure class="thai-portrait"><img src="assets/king-rama-x.webp" alt="泰皇拉瑪十世正式肖像"><figcaption>泰皇拉瑪十世</figcaption></figure>
+<div class="japan-scene" aria-hidden="true">
+<svg class="landscape" viewBox="0 0 1440 1000" preserveAspectRatio="xMidYMax slice">
+<defs><linearGradient id="jpSky" x2="0" y2="1"><stop stop-color="#bacdde"/><stop offset=".6" stop-color="#f2d9d2"/><stop offset="1" stop-color="#e6c1b2"/></linearGradient><linearGradient id="jpMountain" x2="0" y2="1"><stop stop-color="#72899e"/><stop offset="1" stop-color="#354e68"/></linearGradient></defs>
+<path fill="url(#jpSky)" d="M0 0h1440v1000H0z"/><circle cx="1110" cy="230" r="92" fill="#d9776b" opacity=".75"/>
+<g class="jp-cloud" fill="#fff" opacity=".4"><ellipse cx="240" cy="190" rx="210" ry="28"/><ellipse cx="1100" cy="370" rx="240" ry="25"/></g>
+<path d="M150 840L720 335l570 505z" fill="url(#jpMountain)"/><path d="M720 335l-130 115 50-8 35 26 40-32 42 28 34-22 58 9z" fill="#fff4ec"/>
+<path d="M0 750Q160 650 380 800T800 800T1440 710V1000H0z" fill="#758f84"/><path d="M0 870Q220 760 490 900T1000 860T1440 820V1000H0z" fill="#435f58"/>
+<g fill="#ac493c"><path d="M1110 610h22v330h-22zm170 0h22v330h-22z"/><path d="M1065 590q140 30 280 0l-8 30q-135 20-264 0zm18 72h244v18h-244z"/><path d="M1196 615h17v65h-17z"/></g>
+<g stroke="#674b4c" stroke-width="11" fill="none"><path d="M0 110q100 70 280 15M60 140q15-65 100-100M145 145q80 80 180 65"/><path d="M1440 80q-130 90-260 55m130-15q-35 80-150 100"/></g>
+<g fill="#f7ced5" stroke="#d598aa" stroke-width="2"><g transform="translate(70 130)"><circle cx="-13" cy="-7" r="17"/><circle cx="12" cy="-10" r="17"/><circle cy="14" r="17"/><circle r="6" fill="#d8879d"/></g><g transform="translate(130 105)"><circle cx="-13" cy="-7" r="17"/><circle cx="12" cy="-10" r="17"/><circle cy="14" r="17"/><circle r="6" fill="#d8879d"/></g><g transform="translate(175 50)"><circle cx="-13" cy="-7" r="17"/><circle cx="12" cy="-10" r="17"/><circle cy="14" r="17"/><circle r="6" fill="#d8879d"/></g><g transform="translate(220 135)"><circle cx="-13" cy="-7" r="17"/><circle cx="12" cy="-10" r="17"/><circle cy="14" r="17"/><circle r="6" fill="#d8879d"/></g><g transform="translate(280 125)"><circle cx="-13" cy="-7" r="17"/><circle cx="12" cy="-10" r="17"/><circle cy="14" r="17"/><circle r="6" fill="#d8879d"/></g><g transform="translate(235 190)"><circle cx="-13" cy="-7" r="17"/><circle cx="12" cy="-10" r="17"/><circle cy="14" r="17"/><circle r="6" fill="#d8879d"/></g><g transform="translate(310 205)"><circle cx="-13" cy="-7" r="17"/><circle cx="12" cy="-10" r="17"/><circle cy="14" r="17"/><circle r="6" fill="#d8879d"/></g><g transform="translate(1380 110)"><circle cx="-13" cy="-7" r="17"/><circle cx="12" cy="-10" r="17"/><circle cy="14" r="17"/><circle r="6" fill="#d8879d"/></g><g transform="translate(1310 140)"><circle cx="-13" cy="-7" r="17"/><circle cx="12" cy="-10" r="17"/><circle cy="14" r="17"/><circle r="6" fill="#d8879d"/></g><g transform="translate(1260 170)"><circle cx="-13" cy="-7" r="17"/><circle cx="12" cy="-10" r="17"/><circle cy="14" r="17"/><circle r="6" fill="#d8879d"/></g><g transform="translate(1190 135)"><circle cx="-13" cy="-7" r="17"/><circle cx="12" cy="-10" r="17"/><circle cy="14" r="17"/><circle r="6" fill="#d8879d"/></g><g transform="translate(1170 215)"><circle cx="-13" cy="-7" r="17"/><circle cx="12" cy="-10" r="17"/><circle cy="14" r="17"/><circle r="6" fill="#d8879d"/></g></g></svg><div class="petals"><i style="--x:0%;--delay:-0s;--duration:12s;--sway:70px"></i><i style="--x:37%;--delay:-1.3s;--duration:13s;--sway:100px"></i><i style="--x:74%;--delay:-2.6s;--duration:14s;--sway:130px"></i><i style="--x:11%;--delay:-3.9000000000000004s;--duration:15s;--sway:160px"></i><i style="--x:48%;--delay:-5.2s;--duration:16s;--sway:190px"></i><i style="--x:85%;--delay:-6.5s;--duration:17s;--sway:70px"></i><i style="--x:22%;--delay:-7.800000000000001s;--duration:18s;--sway:100px"></i><i style="--x:59%;--delay:-9.1s;--duration:12s;--sway:130px"></i><i style="--x:96%;--delay:-10.4s;--duration:13s;--sway:160px"></i><i style="--x:33%;--delay:-11.700000000000001s;--duration:14s;--sway:190px"></i><i style="--x:70%;--delay:-13s;--duration:15s;--sway:70px"></i><i style="--x:7%;--delay:-14.3s;--duration:16s;--sway:100px"></i><i style="--x:44%;--delay:-15.600000000000001s;--duration:17s;--sway:130px"></i><i style="--x:81%;--delay:-16.900000000000002s;--duration:18s;--sway:160px"></i><i style="--x:18%;--delay:-18.2s;--duration:12s;--sway:190px"></i><i style="--x:55%;--delay:-19.5s;--duration:13s;--sway:70px"></i><i style="--x:92%;--delay:-20.8s;--duration:14s;--sway:100px"></i><i style="--x:29%;--delay:-22.1s;--duration:15s;--sway:130px"></i></div></div>
   <section class="hero" id="hero" hidden>
     <img id="heroImage"
          src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Johnny_Depp-2821.jpg"
@@ -500,7 +544,7 @@ body.japan{background:#f4f0e7;color:#302e2b}
     <div class="theme-picker" id="themePicker" role="group" aria-label="選擇網頁風格" hidden></div>
     <p class="action-status" id="actionStatus" role="status" aria-live="polite"></p>
     <p class="extra" id="extra"></p>
-    <p class="credit" id="credit"></p>
+    <p class="credit" id="credit"></p><p class="thai-attribution">肖像：泰國公共關係部 · <a href="https://commons.wikimedia.org/wiki/File:King_Rama_X_official_(crop).png" target="_blank" rel="noopener">Wikimedia Commons</a> · <a href="https://creativecommons.org/licenses/by/3.0/th/" target="_blank" rel="noopener">CC BY 3.0 TH</a>（縮圖）</p>
   </section>
 </main>
 
