@@ -557,6 +557,7 @@ body.nephew{background:#e3f2ef;color:#294b4c}
  .nephew .page{padding:24px 16px}.nephew-photo{width:148px}
  .nephew-decor span{font-size:55px}
 }
+body[data-rest-day="true"] .time{font-size:clamp(48px,15vw,76px);letter-spacing:0}body[data-rest-day="true"] #countdown,body[data-rest-day="true"] #clockIn,body[data-rest-day="true"] #liveProgress{display:none!important}
 </style>
 </head>
 
@@ -776,7 +777,45 @@ function burstConfetti() {
 }
 
 function resetMotionStatus(){document.getElementById("countdown").removeAttribute("aria-label");document.getElementById("liveProgress").hidden=true;document.getElementById("offGreeting").textContent="";document.body.dataset.offDuty="false";}
+
+function isRestDay(nowMs = Date.now()) {
+  return ['Sat','Sun'].includes(new Intl.DateTimeFormat('en-US', {timeZone:'Asia/Taipei',weekday:'short'}).format(new Date(nowMs)));
+}
+function renderRestDay() {
+  const rest = isRestDay();
+  document.body.dataset.restDay = String(rest);
+  document.getElementById('countdown').hidden = rest;
+  document.getElementById('clockIn').hidden = rest;
+  if (!rest) return false;
+  resetMotionStatus();
+  document.getElementById('offTime').textContent = '休息日';
+  document.getElementById('offGreeting').textContent = '今天放鬆一下，工作日再繼續。';
+  const now = taipeiParts();
+  label.textContent = `${now.month}/${now.day} · 休息日`;
+  document.title = '下班3.0｜今天休息日';
+  extra.textContent = '';
+  document.getElementById('updated').textContent = '';
+  return true;
+}
+let displayedDate = '';
+
 function renderCountdown() {
+  const dateKey = new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Taipei',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+  if (dateKey !== displayedDate) {
+    const previousDate = displayedDate;
+    displayedDate = dateKey;
+    applyTheme();
+    if (previousDate) {
+      offHour = offMinute = offTimestamp = null;
+      document.getElementById('offTime').textContent = '--:--';
+      document.getElementById('countdown').textContent = '今日尚未打卡';
+      document.getElementById('clockIn').textContent = '';
+      resetMotionStatus();
+      if (!isRestDay()) loadOffTime();
+    }
+  }
+  if (renderRestDay()) return;
+
   if (offHour === null || offMinute === null) return;
 
   if (offTimestamp === null) return;
@@ -836,6 +875,7 @@ function parseClockin(data, nowMs) {
 }
 
 async function loadOffTime(manual = false) {
+  if (renderRestDay()) return;
   if (isLoading) return;
   isLoading = true;
   const button = document.getElementById("refreshButton");
@@ -907,6 +947,7 @@ async function loadOffTime(manual = false) {
     isLoading = false;
     button.disabled = false;
     button.textContent = "↻ 立即更新";
+    renderRestDay();
   }
 }
 
@@ -970,6 +1011,7 @@ document.getElementById("shareButton").addEventListener("click", async () => {
 const motionButton=document.getElementById("motionButton");let motionOff=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 function setMotion(){document.documentElement.dataset.motion=motionOff?"off":"on";motionButton.textContent=motionOff?"開啟動畫":"暫停動畫";motionButton.setAttribute("aria-pressed",String(motionOff));}
 setMotion();motionButton.onclick=()=>{motionOff=!motionOff;setMotion();if(motionOff){document.getElementById("confettiLayer")?.remove();document.getAnimations().forEach(a=>a.cancel());}};
+renderCountdown();
 loadOffTime();
 
 /* 倒數每秒更新；可見時每 30 秒同步一次 Gist，節省手機背景流量。 */
