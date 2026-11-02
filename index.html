@@ -558,6 +558,12 @@ body.nephew{background:#e3f2ef;color:#294b4c}
  .nephew-decor span{font-size:55px}
 }
 body[data-rest-day="true"] .time{font-size:clamp(48px,15vw,76px);letter-spacing:0}body[data-rest-day="true"] #countdown,body[data-rest-day="true"] #clockIn,body[data-rest-day="true"] #liveProgress{display:none!important}
+.nephew-gallery{display:none}
+.nephew .nephew-gallery{display:flex;align-items:center;justify-content:center;gap:16px;margin:0 auto 26px;max-width:360px}
+.nephew-gallery .nephew-photo{width:calc((100% - 16px)/2);margin:0;flex:1;min-width:0}
+.nephew-gallery .nephew-balloon{transform:rotate(3deg);border-radius:18px}
+.nephew-balloon img{border-radius:12px;height:auto;object-fit:contain}
+@media(max-width:350px){.nephew .nephew-gallery{gap:10px}.nephew-gallery .nephew-photo{padding:6px 6px 0}.nephew-photo figcaption{font-size:10px}}
 </style>
 </head>
 
@@ -583,7 +589,7 @@ body[data-rest-day="true"] .time{font-size:clamp(48px,15vw,76px);letter-spacing:
   </section>
 
   <section class="card">
-<figure class="nephew-photo"><span class="photo-star" aria-hidden="true">✦</span><img src="assets/nephew-portrait.webp" alt="今天的小主角" width="326" height="425"><figcaption>今天也要開心收工</figcaption></figure>
+<div class="nephew-gallery" aria-label="小可愛相簿"><figure class="nephew-photo"><span class="photo-star" aria-hidden="true">✦</span><img src="assets/nephew-portrait.webp" alt="今天的小主角" width="326" height="425"><figcaption>今天也要開心收工</figcaption></figure><figure class="nephew-photo nephew-balloon"><img src="assets/nephew-balloon.png" alt="小可愛拿著藍色造型氣球" width="303" height="504"><figcaption>帶著氣球，一起去玩</figcaption></figure></div>
     <p class="label" id="label">TODAY · 下班時間</p>
     <h1 class="time" id="offTime">--:--</h1>
     <p class="countdown" id="countdown">讀取中…</p>
